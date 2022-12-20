@@ -15,7 +15,6 @@ ui <- fluidPage(
     # Application title
     titlePanel("Client Region Prediction"),
 
-    # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
             sliderInput("bins",
