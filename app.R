@@ -11,29 +11,24 @@ library(shiny)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
+  titlePanel("WholeSale Customers Prediction"),
+  tabsetPanel(
+    tabPanel("Home",img(src='undraw_code_thinking_re_gka2.svg')
+  ),
+  tabPanel("data",dataTableOutput('data')
+           )
+  ))
 
-    # Application title
-    titlePanel("Client Region Prediction"),
-
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-           plotOutput("distPlot")
-        )
-    )
-)
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-
+  install.packages("ggplot2")
+  #Chargement du jeu de donnees WholeSale Customers et Affichage
+  
+  data = read.csv('./data/Wholesale customers data (1).csv')
+  output$data = renderDataTable(data,options=list(pageLength=5))
+  
+  ##
     output$distPlot <- renderPlot({
         # generate bins based on input$bins from ui.R
         x    <- faithful[, 2]
