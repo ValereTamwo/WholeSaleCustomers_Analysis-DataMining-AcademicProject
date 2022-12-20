@@ -1,0 +1,62 @@
+@font-face{
+    font-family: 'poppins';
+    src: url('./font/Poppins/Poppins-Italic.ttf');
+}
+
+@font-face{
+    font-family: 'jost';
+    src: url('./font/Jost/Jost-VariableFont_wght.ttf');
+}
+*{
+    margin: 0;
+    padding: 0;
+}
+body{
+    font-family: 'poppins';
+    background-color: whitesmoke;
+
+}
+.titre{
+    font-family: "jost";
+    margin-left: 20px;
+    margin-bottom: 7px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.image{
+  /* background-color: rgb(171, 83, 221); */
+}
+
+.p-test{
+    font-size: 20px;
+}
+
+header{
+    width: 100vw;
+    height: 70px;
+    background-color: #8c07da;
+    color: whitesmoke;
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+.btn{
+    width: 100px;
+    height: 40px;
+    border: 1px;
+    padding: 10px;
+    font-family:'jost';
+    margin-right: 40px;
+    background-color: whitesmoke;
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+
+
+.btn-l{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
