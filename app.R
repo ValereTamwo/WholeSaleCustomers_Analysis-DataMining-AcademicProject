@@ -21,12 +21,29 @@ ui <- fluidPage(
       tags$button('Sign In',class='btn text-[arial]',style="color:#ab53dd; font-family:'arial';"),
       tags$button('Log In',style="font-family:'arial';",class='text-[whitesmoke] bg-[#8c07da] h-[40px] w-[100px] mr-[50px] border-[1px] p-[10px] text-[15px] rounded-[4px] mt-[10px] text-[arial]',style="font-family:'arial';")))
   ,
-  dashboardSidebar()
-  ,tabsetPanel(
-    tabPanel("Home",sidebarLayout(sidebarPanel('WholeSale Statistics'),mainPanel('data')),tags$div(img(src='undraw_code_thinking_re_gka2.svg',style="height:400px;width:400px;position:relative;"),class='image',tags$p('Welcome to Data World with R-Shiny',class='p-text'))
+tabsetPanel(
+    tabPanel("Home",
+             sidebarLayout(
+      conditionalPanel(condition = "input.toggleSidebarPanel%2==0",sidebarPanel("Descriptive Statistics"))
+      ,mainPanel(actionButton("toggleSidebarPanel", "", icon = icon("bars")),
+                 plotOutput("distPlot")
+                 )
+      ),
+      tags$div(class="relative left-[40vw]",
+               img(src='undraw_code_thinking_re_gka2.svg',style="height:400px;width:400px;position:relative;"),class='image',
+               tags$p('Welcome to Data World with R-Shiny',class='p-text'))
   ),
   tabPanel(class="text-[arial]" ,"Data",dataTableOutput('data')
            ),
+  tabPanel("Data Vizualization",
+           sidebarLayout(
+             conditionalPanel(condition = "input.toggleSidebarPanel%2==0",sidebarPanel("Select Vizualizing attributes",sidebarMenu()))
+             ,mainPanel(actionButton("toggleSidebarPanel", "", icon = icon("bars")),
+                        plotOutput("distPlot")
+             )
+           )
+           )
+  ,
   tabPanel("About",
            sidebarPanel('Why is this WholeSale Customers Data has been collected?'),
            tags$div(class='flex position relative right-[400px] gap-[30px]', tags$div(class='w-[40vw] h-[55vh] border-[1px] rounded-[20px] justify-center items-center relative left-[9%] top-[70px]'),
@@ -46,14 +63,7 @@ server <- function(input, output) {
   
   ##
     output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
+       plot(iris$Sepal.Length,iris$Petal.Width)
     })
 }
 
