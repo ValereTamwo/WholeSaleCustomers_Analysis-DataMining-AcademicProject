@@ -24,16 +24,17 @@ ui <- fluidPage(
 tabsetPanel(
     tabPanel("Home",
              sidebarLayout(
-      conditionalPanel(condition = "input.toggleSidebarPanel%2==0",sidebarPanel("Predictive Value"))
-      ,mainPanel(actionButton("toggleSidebarPanel", "", icon = icon("bars")),
-                 tags$div(class='flex gap-[30px]',
-                   tags$div(tags$h3('Model Plot'),class='w-[200px] h-[40vh] border-[1px] rounded-[10px]'),
-                  tags$div(tags$h3( class="relative", 'Accuracy Calcul'),class='w-[200px] h-[45vh] border-[1px] rounded-[10px]'))
+      conditionalPanel(condition = "input.toggleSidebarPanel%2==0",sidebarPanel(tags$h3('Predictive Value Form', class="relative w-[full] h-[40px] bottom-[20px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]") ,class="w-[30vw] h-[70vh] mt-[12px]"))
+      ,mainPanel(class='relative right-[4vw]',actionButton("toggleSidebarPanel", "", icon = icon("bars")),
+                 tags$div(class='flex gap-[30px] relative left-[70px] bottom-[40px]' ,
+                   tags$div(tags$h3('Model Plot', class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),class='w-[35vw] h-[83vh] border-[1px] rounded-[10px]'),
+                  tags$div(tags$h3( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]", 'Accuracy Calcul'),class='w-[30vw] h-[70vh] border-[1px] rounded-[10px]'))
                  )
-      ),
-      tags$div(class="relative left-[40vw]",
-               img(src='undraw_code_thinking_re_gka2.svg',style="height:400px;width:400px;position:relative;"),class='image',
-               tags$p('Welcome to Data World with R-Shiny',class='p-text'))
+      )
+      #,
+     # tags$div(class="relative left-[40vw]",
+       #        img(src='undraw_code_thinking_re_gka2.svg',style="height:400px;width:400px;position:relative;"),class='image',
+        #       tags$p('Welcome to Data World with R-Shiny',class='p-text'))
   ),
   tabPanel(class="text-[arial]" ,"Data",dataTableOutput('data')
            ),
