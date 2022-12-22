@@ -24,9 +24,11 @@ ui <- fluidPage(
 tabsetPanel(
     tabPanel("Home",
              sidebarLayout(
-      conditionalPanel(condition = "input.toggleSidebarPanel%2==0",sidebarPanel("Descriptive Statistics"))
+      conditionalPanel(condition = "input.toggleSidebarPanel%2==0",sidebarPanel("Predictive Value"))
       ,mainPanel(actionButton("toggleSidebarPanel", "", icon = icon("bars")),
-                 plotOutput("distPlot")
+                 tags$div(class='flex gap-[30px]',
+                   tags$div(tags$h3('Model Plot'),class='w-[200px] h-[40vh] border-[1px] rounded-[10px]'),
+                  tags$div(tags$h3( class="relative", 'Accuracy Calcul'),class='w-[200px] h-[45vh] border-[1px] rounded-[10px]'))
                  )
       ),
       tags$div(class="relative left-[40vw]",
@@ -35,6 +37,8 @@ tabsetPanel(
   ),
   tabPanel(class="text-[arial]" ,"Data",dataTableOutput('data')
            ),
+  tabPanel("Handle Missing data",tags$div(class="",))
+  ,
   tabPanel("Data Vizualization",
            sidebarLayout(
              conditionalPanel(condition = "input.toggleSidebarPanel%2==0",sidebarPanel("Select Vizualizing attributes",sidebarMenu()))
@@ -42,7 +46,8 @@ tabsetPanel(
                         plotOutput("distPlot")
              )
            )
-           )
+           ),
+  tabPanel("Relevant Attributes")
   ,
   tabPanel("About",
            sidebarPanel('Why is this WholeSale Customers Data has been collected?'),
