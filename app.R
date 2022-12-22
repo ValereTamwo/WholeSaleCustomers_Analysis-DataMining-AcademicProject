@@ -10,6 +10,7 @@
 library(shiny)
 library(shiny.tailwind)
 library(shinydashboard)
+library(shinyBS)
 options(shiny.launch.browser = .rs.invokeShinyWindowExternal)
 
 # Define UI for application that draws a histogram
@@ -18,8 +19,18 @@ ui <- fluidPage(
   includeCSS('./style.css'),tags$header(
     tags$h2("WholeSale Customers Prediction",class='text-[20px] text-[arial] font-[bold] ml-[20px] mb-[7px] mt-[10px]',style="font-family:'arial';"),
     tags$div(class='btn-l',
-      tags$button('Sign In',class='btn text-[arial]',style="color:#ab53dd; font-family:'arial';"),
-      tags$button('Log In',style="font-family:'arial';",class='text-[whitesmoke] bg-[#8c07da] h-[40px] w-[100px] mr-[50px] border-[1px] p-[10px] text-[15px] rounded-[4px] mt-[10px] text-[arial]',style="font-family:'arial';")))
+      tags$button('Sign In',id='modal',class='btn text-[arial]',style="color:#ab53dd; font-family:'arial';"),
+      tags$button('Log In',id='logmod',style="font-family:'arial';",class='text-[whitesmoke] bg-[#8c07da] h-[40px] w-[100px] mr-[50px] border-[1px] p-[10px] text-[15px] rounded-[4px] mt-[10px] text-[arial]',style="font-family:'arial';")
+      ),bsModal(id = 'signIn' , trigger = "modal",size = "large" ,
+                tags$div(
+        tags$h2(icon('lock',class = 'mr-[5px]'),' Admin Sign In', class="relative font-[arial] w-[full] h-[40px] text-[#8c07da] font-[bold] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+        class='w-[40vw] h-[50vh] border-[1px] relative left-[13%] top-[15px] border-[#8c07da] text-[#333] font-[bold] text-[20px] font-[arial] rounded-[10px]')
+        ),bsModal(id = 'Login' , trigger = "logmod",size = "large" ,
+                  tags$div(
+                    tags$h2(icon('user',class = 'mr-[5px]'),' Welcome Back : Log In', class="relative font-[arial] w-[full] text-[#8c07da] font-[bold] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                    class='w-[40vw] h-[50vh] border-[1px] relative left-[13%] top-[15px] border-[#8c07da] text-[#333] font-[bold] text-[20px] font-[arial] rounded-[10px]')
+        )
+    )
   ,
 tabsetPanel(
     tabPanel("Home",
