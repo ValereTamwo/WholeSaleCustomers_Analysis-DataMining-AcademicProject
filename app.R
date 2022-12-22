@@ -35,7 +35,14 @@ ui <- fluidPage(
 tabsetPanel(
     tabPanel("Home",
              sidebarLayout(
-      conditionalPanel(condition = "input.toggleSidebarPanel%2==0",sidebarPanel(tags$h3('Predictive Value Form', class="relative w-[full] h-[40px] bottom-[20px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]") ,class="w-[30vw] h-[70vh] mt-[12px]"))
+      conditionalPanel(condition = "input.toggleSidebarPanel%2==0",
+                       sidebarPanel(tags$h3('Predictive Value Form', 
+                                            class="relative w-[full] h-[40px] bottom-[20px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]")
+                                    ,wellPanel(numericInput('Fresh','Fresh Depense',value = 2303),numericInput('Milk','Milk Depense',value = 2303),
+                                               numericInput('grocery','Grocery Depense',value = 203),numericInput('Frozen','Frozen Depense',value = 2303),
+                                               numericInput('detergent','Detergent Paper Depense',value = 2303),numericInput('Delis','Delicassen Depense',value = 2303)),
+                                    class="w-[30vw] h-[70vh] mt-[12px]")
+                       )
       ,mainPanel(class='relative right-[4vw]',actionButton("toggleSidebarPanel", "", icon = icon("bars")),
                  tags$div(class='flex gap-[30px] relative left-[70px] bottom-[40px]' ,
                    tags$div(class='flex flex-col ',
@@ -57,23 +64,27 @@ tabsetPanel(
         #       tags$p('Welcome to Data World with R-Shiny',class='p-text'))
   ),
   tabPanel(class="text-[arial] ml-[5vw]" ,"Data",
-           tags$div(class='w-full h-[30%]',
-             tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Original Data'),
-            dataTableOutput("data")
-            )
-    ,tags$div(class='w-full h-[30%]',
-            tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Clean Data'),
-            dataTableOutput("data1")
-            ),
-    tags$div(class='w-full h-[30%]',
-             tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'TrainSet'),
-             dataTableOutput("data2")
-             ),
-    tags$div(class='w-full h-[30%]',
-             tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'TestSet'),
-             dataTableOutput("data3")
-             )
-    )
+           tabsetPanel(tabPanel("Original Data",
+                                tags$div(class='w-full h-[30%]',
+                                         tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Original Data'),
+                                         dataTableOutput("data")
+                                )),
+                              
+                       tabPanel("Clean Data",tags$div(class='w-full h-[30%]',
+                                                      tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Clean Data'),
+                                                      dataTableOutput("data1")
+                       )),
+                       tabPanel("TrainSet",tags$div(class='w-full h-[30%]',
+                                                    tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'TrainSet'),
+                                                    tags$div(class='relative left-[7vw] w-[100%] h-[100%] p-[10px] mt-[20px]',sliderInput('trainValue','Choose Train Data Size(%)',min = 24,value = 70,max = 100)),
+                                                    dataTableOutput("data2")
+                       )),
+                       tabPanel("TestSet",  tags$div(class='w-full h-[30%]',
+                                                     tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'TestSet'),
+                                                     dataTableOutput("data3")
+                       ))
+                       )
+                       )
   ,
   tabPanel("Handle Missing data",tags$div(class="",))
   ,
