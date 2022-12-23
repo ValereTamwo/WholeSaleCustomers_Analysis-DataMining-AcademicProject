@@ -69,12 +69,13 @@ tabsetPanel(
                   tags$div(
                     tags$h3( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]", 'Accuracy Calcul'),class='w-[30vw] h-[70vh] border-[1px] rounded-[10px]'))
                  )
+      ),tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
       )
       #,
      # tags$div(class="relative left-[40vw]",
        #        img(src='undraw_code_thinking_re_gka2.svg',style="height:400px;width:400px;position:relative;"),class='image',
         #       tags$p('Welcome to Data World with R-Shiny',class='p-text'))
-  ),
+  )),
   tabPanel(class="text-[arial] ml-[5vw]" ,"Data",
            tabsetPanel(tabPanel("Original Data",
                                 tags$div(class='w-full h-[30%]',
@@ -95,10 +96,76 @@ tabsetPanel(
                                                      tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'TestSet'),
                                                      dataTableOutput("data3")
                        ))
-                       )
+                       ),tags$footer(class='w-[98vw] p-[100] h-[70px] right-[5vw] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
+                       ))
                        )
   ,
-  tabPanel("Handle Missing data",tags$div(class="",))
+  tabPanel("Handle Missing data",sidebarLayout(sidebarPanel (class="mt-[30px]",
+    wellPanel("Warning",icon('warning'),class=" text-[20px] text-[red]",
+              tags$p(class="w-[full] text-[14px] text-[#333] h-[70px] justify-center items-center p-[10px]","Initially Our DataSet Has no Missing Data"),
+              tags$div(class="w-[80%] left-[1.5vw] p-[10px]  relative h-[40vh] border-[1px] rounded-[10px] text-[17px] text-[#333]",tags$p("Deleting Outliers Value Will bring us missing data"))
+              )),mainPanel(
+                tags$div(class="grid grid-cols-2 gap-4 mt-[40px]",
+                         tags$div(class="w-[400px] h-[500px] border-[1px] mr-[10vw] p-[10px] rounded-[10px]",
+                                  tags$h3('Fresh BoxPlot', 
+                                          class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                                  tags$div(class='w-full h-[50%]',
+                                           #plotOutput("distPlot")
+                                  ),
+                                  tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
+                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                  )
+                         ),
+                         tags$div(class="w-[400px] h-[500px] flex flex-col gap-[4px] border-[1px] rounded-[10px]",
+                                  tags$h3('Milk BoxPlot', 
+                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                                  tags$div(class='w-full h-[50%]'),
+                                  tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
+                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                  )
+                         ),
+                         tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
+                                  tags$h3('Grocery Boxplot', 
+                                          class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                                  tags$div(class='w-full h-[50%]'),
+                                  tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
+                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                  )
+                         ),
+                         tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
+                                  tags$h3('Detergent_Paper BoxPlot', 
+                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
+                                  tags$div(class='w-full h-[50%]'),
+                                  tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
+                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                  )
+                                  
+                         ),
+                         tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
+                                  tags$h3('Frozen BoxPlot', 
+                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
+                                  tags$div(class='w-full h-[50%]'),
+                                  tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
+                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                  )
+                                  
+                         ),
+                         tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
+                                  tags$h3('Delicassen BoxPlot', 
+                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
+                                  tags$div(class='w-full h-[50%]'),
+                                  tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
+                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                  )
+                                  
+                         )
+                )
+              )
+    ),tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
+    )
+    )
+    )
+  
   ,
   tabPanel("Data Vizualization",
            sidebarLayout(
@@ -152,17 +219,24 @@ tabsetPanel(
                                  #  tags$div(class="w-[200px] h-[400px] border-[1px] rounded-[10px]"),tags$div(class="w-200px] h-[400px] border-[1px] rounded-[10px]"))
                         
              )
+           ),tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
+           )
            )
            ),
-  tabPanel("Relevant Attributes")
+  tabPanel("Relevant Attributes",sidebarLayout(sidebarPanel(wellPanel(tags$h2(class="text-[#8c07da] text-[17px]", "Correlation plot"),tags$div(class="",tags$p("Analisis")))),mainPanel(dataTableOutput("")),position = c("left")),
+           tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[90vh] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model') ))
+           )
   ,
   tabPanel("About",
-           sidebarPanel('Why is this WholeSale Customers Data has been collected?' , class='mt-[10px]'),
-           tags$div(class='flex position relative right-[400px] gap-[30px]', tags$div(class='w-[40vw] h-[55vh] border-[1px] rounded-[20px] justify-center items-center relative left-[9%] top-[70px]'),
-                    tags$div(class='w-[40vw] h-[55vh] border-[1px] rounded-[20px] justify-center items-center relative left-[9%] top-[70px]')),
-  ),tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
-                                                                                                               )
-                )
+           sidebarLayout(sidebarPanel('Why is this WholeSale Customers Data has been collected?' , class='mt-[10px]'),mainPanel(
+             tags$div(class='flex position relative right-[400px] gap-[30px]', tags$div(class='w-[40vw] h-[55vh] border-[1px] rounded-[20px] justify-center items-center relative left-[9%] top-[70px]'),
+                      tags$div(class='w-[40vw] h-[55vh] border-[1px] rounded-[20px] justify-center items-center relative left-[9%] top-[70px]'))
+           )
+                         )
+           ,tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
+           )
+           )
+  )
   ))
 
 # Define server logic required to draw a histogram
