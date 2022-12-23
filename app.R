@@ -24,10 +24,19 @@ ui <- fluidPage(
       ),bsModal(id = 'signIn' , trigger = "modal",size = "large" ,
                 tags$div(
         tags$h2(icon('lock',class = 'mr-[5px]'),' Admin Sign In', class="relative font-[arial] w-[full] h-[40px] text-[#8c07da] font-[bold] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
-        class='w-[40vw] h-[50vh] border-[1px] relative left-[13%] top-[15px] border-[#8c07da] text-[#333] font-[bold] text-[20px] font-[arial] rounded-[10px]')
+        wellPanel(
+                  textInput('email','Enter your Email',value = "dataMining@gmail.com"),textInput('pss','Enter Your PassWord',value = "2303"),
+                  submitButton(text = 'Send',width = '200px',icon('th'))
+        ),
+        class='w-[40vw] h-[50vh] border-[1px] relative left-[13%] top-[15px] border-[#8c07da] text-[#333] font-[bold] text-[20px] font-[arial] rounded-[10px]'
+        )
         ),bsModal(id = 'Login' , trigger = "logmod",size = "large" ,
                   tags$div(
                     tags$h2(icon('user',class = 'mr-[5px]'),' Welcome Back : Log In', class="relative font-[arial] w-[full] text-[#8c07da] font-[bold] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                    wellPanel(
+                      textInput('email','Enter your Email',value = "dataMining@gmail.com"),textInput('pss','Enter Your PassWord',value = "2303"),
+                      submitButton(text = 'Send',width = '200px',icon('th'))
+                    ),
                     class='w-[40vw] h-[50vh] border-[1px] relative left-[13%] top-[15px] border-[#8c07da] text-[#333] font-[bold] text-[20px] font-[arial] rounded-[10px]')
         )
     )
@@ -38,10 +47,13 @@ tabsetPanel(
       conditionalPanel(condition = "input.toggleSidebarPanel%2==0",
                        sidebarPanel(tags$h3('Predictive Value Form', 
                                             class="relative w-[full] h-[40px] bottom-[20px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]")
-                                    ,wellPanel(numericInput('Fresh','Fresh Depense',value = 2303),numericInput('Milk','Milk Depense',value = 2303),
+                                    ,wellPanel(selectInput('Model','Choose a predictive Model',choices = c("decision Tree"="Decision Tree","Neural Network"="Neural Network","KNN"="KNN","Bayes"="Bayes")),
+                                               numericInput('Fresh','Fresh Depense',value = 2303),numericInput('Milk','Milk Depense',value = 2303),
                                                numericInput('grocery','Grocery Depense',value = 203),numericInput('Frozen','Frozen Depense',value = 2303),
-                                               numericInput('detergent','Detergent Paper Depense',value = 2303),numericInput('Delis','Delicassen Depense',value = 2303)),
-                                    class="w-[30vw] h-[70vh] mt-[12px]")
+                                               numericInput('detergent','Detergent Paper Depense',value = 2303),numericInput('Delis','Delicassen Depense',value = 2303),
+                                              submitButton(text = 'Predict',width = '200px',icon('th'))
+                                                       ),
+                                    class="w-[30vw] h-[90vh] mt-[12px]")
                        )
       ,mainPanel(class='relative right-[4vw]',actionButton("toggleSidebarPanel", "", icon = icon("bars")),
                  tags$div(class='flex gap-[30px] relative left-[70px] bottom-[40px]' ,
@@ -90,9 +102,55 @@ tabsetPanel(
   ,
   tabPanel("Data Vizualization",
            sidebarLayout(
-             conditionalPanel(condition = "input.toggleSidebarPanel%2==0",sidebarPanel("Select Vizualizing attributes",sidebarMenu()))
+             conditionalPanel(condition = "input.toggleSidebarPanel%2==0",sidebarPanel("Select Vizualizing attributes",class="relative top-[20px] bottom-[30px]",
+                                                                                       wellPanel(
+                                                                                         selectInput('vizA','Select the attribute to vizualize',choices = c("Fresh"="Fresh","Milk"="Milk","Grocery"="Grocery","Frozen"="Frozen","Detergent_Paper"="Detergent_Paper","Delicassen"="Delicassen")),
+                                                                                         selectInput('vizA2','Select the Y attributes for line plot',choices = c("Fresh"="Fresh","Milk"="Milk","Grocery"="Grocery","Frozen"="Frozen","Detergent_Paper"="Detergent_Paper","Delicassen"="Delicassen")),
+                                                                                           #      submitButton(text = 'Predict',width = '200px',icon('th'))
+                                                                                       ),
+                                                                                       tags$img(src='undraw_visualization_re_1kag.svg',alt='Vizualise Data',class="w-[50vw] h-[50vh]")
+                                                                                       )
+                              )
              ,mainPanel(actionButton("toggleSidebarPanel", "", icon = icon("bars")),
-                        plotOutput("distPlot")
+                        tags$div(class="grid grid-cols-2 gap-4",
+                                tags$div(class="w-[400px] h-[500px] border-[1px] mr-[10vw] p-[10px] rounded-[10px]",
+                                         tags$h3('Histogram', 
+                                                 class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                                         tags$div(class='w-full h-[50%]',
+                                                  #plotOutput("distPlot")
+                                                  ),
+                                         tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
+                                                                                 class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                         )
+                                         ),
+                                 tags$div(class="w-[400px] h-[500px] flex flex-col gap-[4px] border-[1px] rounded-[10px]",
+                                          tags$h3('Pie Chart', 
+                                                  class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                                          tags$div(class='w-full h-[50%]'),
+                                          tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
+                                                           class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                                   )
+                                          ),
+                                 tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
+                                          tags$h3('Scatter plot', 
+                                                  class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                                          tags$div(class='w-full h-[50%]'),
+                                          tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
+                                                                                  class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                          )
+                                          ),
+                                 tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
+                                          tags$h3('Line Plot', 
+                                                  class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
+                                          tags$div(class='w-full h-[50%]'),
+                                          tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
+                                                                                  class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                          )
+                                          
+                                          )
+                                )
+                                 #  tags$div(class="w-[200px] h-[400px] border-[1px] rounded-[10px]"),tags$div(class="w-200px] h-[400px] border-[1px] rounded-[10px]"))
+                        
              )
            )
            ),
