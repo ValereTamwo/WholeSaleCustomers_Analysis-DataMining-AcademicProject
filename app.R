@@ -11,6 +11,7 @@ library(shiny)
 library(shiny.tailwind)
 library(shinydashboard)
 library(shinyBS)
+library(corrplot)
 options(shiny.launch.browser = .rs.invokeShinyWindowExternal)
 
 # Define UI for application that draws a histogram
@@ -80,7 +81,12 @@ tabsetPanel(
                                 tags$div(class='w-full h-[30%]',
                                          tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Original Data'),
                                          dataTableOutput("data")
+                                         
                                 )),
+                       tabPanel("Correlation matrix",tags$div(class='w-full h-[30%]',
+                                                              tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Correlation matrix'),
+                                                              dataTableOutput("data5")
+                                                              )),
                               
                        tabPanel("Clean Data",tags$div(class='w-full h-[30%]',
                                                       tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Clean Data'),
@@ -98,7 +104,7 @@ tabsetPanel(
                        )
                        )
   ,
-  tabPanel("Handle Missing data",tags$div(class="",))
+  tabPanel("Handle Missing data",tags$div(class="",),)
   ,
   tabPanel("Data Vizualization",
            sidebarLayout(
@@ -163,7 +169,10 @@ tabsetPanel(
   ),tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
                                                                                                                )
                 )
-  ))
+  )
+
+
+)
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
@@ -171,16 +180,21 @@ server <- function(input, output) {
   #Chargement du jeu de donnees WholeSale Customers et Affichage
   
   data = read.csv('./data/Wholesale customers data (1).csv')
+  data4=rquery.cormat(data,type='full')
   output$data = renderDataTable(data,options=list(pageLength=5))
   output$data1 = renderDataTable(data,options=list(pageLength=5))
   output$data2 = renderDataTable(data,options=list(pageLength=5))
   output$data3 = renderDataTable(data,options=list(pageLength=5))
+  output$data5=renderDataTable(data4,options=list(pageLength=5))
+  
   
   
   ##
-    output$distPlot <- renderPlot({
-       plot(iris$Sepal.Length,iris$Petal.Width)
-    })
+  output$distPlot <- renderPlot({
+    plot(iris$Sepal.Length,iris$Petal.Width)
+  })
+  
+  
 }
 
 # Run the application 
