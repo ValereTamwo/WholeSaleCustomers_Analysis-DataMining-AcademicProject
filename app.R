@@ -106,56 +106,67 @@ tabsetPanel(
               tags$div(class="w-[80%] left-[1.5vw] p-[10px]  relative h-[40vh] border-[1px] rounded-[10px] text-[17px] text-[#333]",tags$p("Deleting Outliers Value Will bring us missing data"))
               )),mainPanel(
                 tags$div(class="grid grid-cols-2 gap-4 mt-[40px]",
-                         tags$div(class="w-[400px] h-[500px] border-[1px] mr-[10vw] p-[10px] rounded-[10px]",
+                         tags$div(class="w-[400px] h-[500px] border-[1px] mr-[10vw] p-[10px] rounded-[10px] ",
                                   tags$h3('Fresh BoxPlot', 
                                           class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
                                   tags$div(class='w-full h-[50%]',
-                                           #plotOutput("distPlot")
+                                           plotOutput("boxF")
                                   ),
                                   tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
-                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
+                                           tags$p("Outliers Value as we see start from ",class="relative top-[5px] left-[6vw] text-[#8c07da]",tags$em("35000",class="text-[red]"))
                                   )
                          ),
                          tags$div(class="w-[400px] h-[500px] flex flex-col gap-[4px] border-[1px] rounded-[10px]",
                                   tags$h3('Milk BoxPlot', 
                                           class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
-                                  tags$div(class='w-full h-[50%]'),
+                                  tags$div(class='w-full h-[50%]',
+                                           plotOutput("boxM")),
                                   tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
-                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
+                                           tags$p("Outliers Value as we see start from ",class="relative top-[5px] left-[6vw] text-[#8c07da]",tags$em("15000",class="text-[red]"))
                                   )
                          ),
                          tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
                                   tags$h3('Grocery Boxplot', 
                                           class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
-                                  tags$div(class='w-full h-[50%]'),
+                                  tags$div(class='w-full h-[50%]',
+                                           plotOutput("boxG")),
                                   tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
-                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
+                                           tags$p("Outliers Value as we see start from ",class="relative top-[5px] left-[6vw] text-[#8c07da]",tags$em("24000",class="text-[red]"))
                                   )
                          ),
                          tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
                                   tags$h3('Detergent_Paper BoxPlot', 
                                           class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
-                                  tags$div(class='w-full h-[50%]'),
+                                  tags$div(class='w-full h-[50%]',
+                                           plotOutput("boxD")),
                                   tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
-                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
+                                           tags$p("Outliers Value as we see start from ",class="relative top-[5px] left-[6vw] text-[#8c07da]",tags$em("9500",class="text-[red]"))
                                   )
                                   
                          ),
                          tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
                                   tags$h3('Frozen BoxPlot', 
                                           class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
-                                  tags$div(class='w-full h-[50%]'),
+                                  tags$div(class='w-full h-[50%]',
+                                           plotOutput("boxFr")),
                                   tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
-                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
+                                           tags$p("Outliers Value as we see start from ",class="relative top-[5px] left-[6vw] text-[#8c07da]",tags$em("24000",class="text-[red]"))
                                   )
                                   
                          ),
                          tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
                                   tags$h3('Delicassen BoxPlot', 
                                           class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
-                                  tags$div(class='w-full h-[50%]'),
+                                  tags$div(class='w-full h-[50%]',
+                                           plotOutput("boxDe")),
                                   tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
-                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                                                          class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
+                                           tags$p("Outliers Value as we see start from ",class="relative top-[5px] left-[6vw] text-[#8c07da]",tags$em("24000",class="text-[red]"))
                                   )
                                   
                          )
@@ -252,6 +263,52 @@ server <- function(input, output) {
   
   
   ##
+  
+  #+++++++++++++++++Handling Missing Data Vizualising BoxPlot++++++++++++++++++++++++++++++++++# 
+  
+  output$boxF= renderPlot({
+    options(repr.plot.width=9,repr.plot.height=9)
+  box1= ggplot(data,aes(x=Fresh,color=Fresh))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
+  box=box1+scale_color_brewer(palette = "Dark2")
+  plot(box)
+  })
+  
+  output$boxM= renderPlot({
+    options(repr.plot.width=9,repr.plot.height=9)
+    box2= ggplot(data,aes(x=Milk,color=Milk))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
+    boxx=box2+scale_color_brewer(palette = "Dark2")
+    plot(boxx)
+  })
+  
+  output$boxG= renderPlot({
+    options(repr.plot.width=9,repr.plot.height=9)
+    box3= ggplot(data,aes(x=Grocery,color=Grocery))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
+    boxxx=box3+scale_color_brewer(palette = "Dark2")
+    plot(boxxx)
+  })
+  
+  output$boxD= renderPlot({
+    options(repr.plot.width=9,repr.plot.height=9)
+    box4= ggplot(data,aes(x=Detergents_Paper,color=Detergents_Paper))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
+    boxxxx=box4+scale_color_brewer(palette = "Dark2")
+    plot(boxxxx)
+  })
+  
+  output$boxFr= renderPlot({
+    options(repr.plot.width=9,repr.plot.height=9)
+    box5= ggplot(data,aes(x=Frozen,color=Frozen))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
+    boxxxxx=box5+scale_color_brewer(palette = "Dark2")
+    plot(boxxxxx)
+  })
+  
+  output$boxDe= renderPlot({
+    options(repr.plot.width=9,repr.plot.height=9)
+    box6= ggplot(data,aes(x=Delicassen,color=Delicassen))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
+    boxxxxxxx=box6+scale_color_brewer(palette = "Dark2")
+    plot(boxxxxxxx)
+  })
+  
+  #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
     output$distPlot <- renderPlot({
        plot(iris$Sepal.Length,iris$Petal.Width)
     })
