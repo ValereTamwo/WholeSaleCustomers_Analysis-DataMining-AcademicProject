@@ -12,6 +12,7 @@ library(shiny.tailwind)
 library(shinydashboard)
 library(shinyBS)
 library(corrplot)
+#library(shiny.semantic)
 options(shiny.launch.browser = .rs.invokeShinyWindowExternal)
 
 # Define UI for application that draws a histogram
@@ -104,8 +105,94 @@ tabsetPanel(
                        )
                        )
   ,
-  tabPanel("Handle Missing data",tags$div(class="",),)
-  ,
+  tabPanel("Handle Missing data",
+           sidebarLayout(
+             sidebarPanel('Warning!!!!',class="grid grid-cols-2 gap-4 cl relative top-[20px] bottom-[30px] text-[#8c07da]",
+                 textOutput('text'),
+                wellPanel(textOutput('text1'))),
+                      # mainPanel('Ploting box plot and Analysis',class="relative top-[30px] bottom-[30px] font-[bold] text-[#8c07da] text-[50px]")
+           
+             mainPanel( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]",'Ploting box plot and Analysis',
+                       tags$div(class="grid grid-cols-2 gap-4",
+                                tags$div(class="w-[400px] h-[500px] border-[1px] mr-[10vw] p-[10px] rounded-[10px]",
+                                         tags$h3('Boxplot_Fresh', 
+                                                 class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                                         tags$div(class='w-full h-[50%]',
+                                                  plotOutput("fresh")
+                                         ),
+                                         tags$div(class="w-full h-[40%]",tags$h3('Analysis_Fresh', 
+                                                                                 class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                                  ,textOutput('text2')
+                                         )
+                                ),
+                                tags$div(class="w-[400px] h-[500px] flex flex-col gap-[4px] border-[1px] rounded-[10px]",
+                                         tags$h3('Boxplot_Milk', 
+                                                 class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                                         tags$div(class='w-full h-[50%]',
+                                                  plotOutput("milk")
+                                                  ),
+                                         tags$div(class="w-full h-[40%]",tags$h3('Analysis_Milk', 
+                                                                                 class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                                  ,textOutput('text3')
+                                                   )
+                                ),
+                                tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
+                                         tags$h3('Boxplot_Grocery', 
+                                                 class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                                         tags$div(class='w-full h-[50%]',
+                                                  plotOutput("grocery")
+                                                  ),
+                                         tags$div(class="w-full h-[40%]",tags$h3('Analysis_Grocery', 
+                                                                                 class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                                  ,textOutput('text4')
+                                                   ),
+                                         
+                                         
+                                ),
+                                tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
+                                         tags$h3('Boxplot_Frozen', 
+                                                 class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
+                                         tags$div(class='w-full h-[50%]',
+                                                  plotOutput("frozen")
+                                                  ),
+                                         tags$div(class="w-full h-[40%]",tags$h3('Analysis_Frozen', 
+                                                                                 class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                                  ,textOutput('text7')
+                                                   ),
+                                         
+                                ),
+                                
+                                tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
+                                         tags$h3('Boxplot_Detergent_paper', 
+                                                 class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
+                                         tags$div(class='w-full h-[50%]',
+                                                  plotOutput("paper")
+                                                  ),
+                                         tags$div(class="w-full h-[40%]",tags$h3('Analysis_Detergent_paper', 
+                                                                                 class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                                  ,textOutput('text5')
+                                                   ),
+                                         
+                                ),
+                                tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
+                                         tags$h3('Boxplot_Delicassen', 
+                                                 class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
+                                         tags$div(class='w-full h-[50%]',
+                                                  plotOutput("deli")
+                                                  ),
+                                         tags$div(class="w-full h-[40%]",tags$h3('Analysis_Delicassen', 
+                                                                                 class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
+                                                  ,textOutput('text6')
+                                                   )
+                                         
+                                )
+                       )
+                       #  tags$div(class="w-[200px] h-[400px] border-[1px] rounded-[10px]"),tags$div(class="w-200px] h-[400px] border-[1px] rounded-[10px]"))
+                       
+             )
+           )
+  ),
+  
   tabPanel("Data Vizualization",
            sidebarLayout(
              conditionalPanel(condition = "input.toggleSidebarPanel%2==0",sidebarPanel("Select Vizualizing attributes",class="relative top-[20px] bottom-[30px]",
@@ -166,26 +253,48 @@ tabsetPanel(
            sidebarPanel('Why is this WholeSale Customers Data has been collected?' , class='mt-[10px]'),
            tags$div(class='flex position relative right-[400px] gap-[30px]', tags$div(class='w-[40vw] h-[55vh] border-[1px] rounded-[20px] justify-center items-center relative left-[9%] top-[70px]'),
                     tags$div(class='w-[40vw] h-[55vh] border-[1px] rounded-[20px] justify-center items-center relative left-[9%] top-[70px]')),
-  ),tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
+  ),
+  tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
                                                                                                                )
                 )
-  )
-
-
 )
+)
+
+
+
+
+
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   library(ggplot2)
+  library(reshape2)
   #Chargement du jeu de donnees WholeSale Customers et Affichage
   
   data = read.csv('./data/Wholesale customers data (1).csv')
-  data4=rquery.cormat(data,type='full')
+  cormat=round(cor(data),2)
+  melted_cormat=melt(cormat)
   output$data = renderDataTable(data,options=list(pageLength=5))
   output$data1 = renderDataTable(data,options=list(pageLength=5))
   output$data2 = renderDataTable(data,options=list(pageLength=5))
   output$data3 = renderDataTable(data,options=list(pageLength=5))
-  output$data5=renderDataTable(data4,options=list(pageLength=5))
+  output$data5=renderDataTable(melted_cormat,options=list(pageLength=5))
+  output$text=renderText({paste('Initially our data has no missing data')})
+  output$text1=renderText({paste('Deleting missing outliers will bring missing values')})
+  #boxplot and analysis
+  output$fresh=renderPlot({boxplot(data$Fresh,data=data)})
+  output$text2=renderText({paste('Initially our data has no missing data')})
+  output$milk=renderPlot({boxplot(data$Milk,data=data)})
+  output$text3=renderText({paste('Initially our data has no missing data')})
+  output$grocery=renderPlot({boxplot(data$Grocery,data=data)})
+  output$text4=renderText({paste('Initially our data has no missing data')})
+  output$paper=renderPlot({boxplot(data$Detergents_Paper,data=data)})
+  output$text5=renderText({paste('Initially our data has no missing data')})
+  output$deli=renderPlot({boxplot(data$Delicassen,data=data)})
+  output$text6=renderText({paste('Initially our data has no missing data')})
+  output$frozen=renderPlot({boxplot(data$Frozen,data=data)})
+  output$text7=renderText({paste('Initially our data has no missing data')})
+ # ggplot(data=melted_data,aes(Fresh,detergent,)+geom_tile()
   
   
   
@@ -196,6 +305,7 @@ server <- function(input, output) {
   
   
 }
+  
 
 # Run the application 
 shinyApp(ui = ui, server = server)
