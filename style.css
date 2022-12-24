@@ -60,3 +60,7 @@ header{
     flex-direction: row;
     gap: 20px;
 }
+
+aside{
+    color:#ff3300
+}
