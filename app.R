@@ -103,7 +103,18 @@ tabsetPanel(
   tabPanel("Handle Missing data",sidebarLayout(sidebarPanel (class="mt-[30px]",
     wellPanel("Warning",icon('warning'),class=" text-[20px] text-[red]",
               tags$p(class="w-[full] text-[14px] text-[#333] h-[70px] justify-center items-center p-[10px]","Initially Our DataSet Has no Missing Data"),
-              tags$div(class="w-[80%] left-[1.5vw] p-[10px]  relative h-[40vh] border-[1px] rounded-[10px] text-[17px] text-[#333]",tags$p("Deleting Outliers Value Will bring us missing data"))
+              tags$div(class="w-[80%] left-[1.5vw] p-[10px]  relative h-[40vh] border-[1px] rounded-[10px] text-[17px] text-[#333]",tags$p("Deleting Outliers Value Will bring us missing data for Each attributes : "),
+                       tags$button(id="delete",icon("trash"),"Delete Outlier",class="bg-[red] text-[white] relative left-[20px] top-[23vh] h-[40px] w-[90%] text-[center] rounded-[10px]"),
+                       bsModal(id = 'outdata',title = 'Warning',trigger = 'delete',
+                               wellPanel(
+                                 tags$div(
+                                   tags$h2(icon('warning',class = 'mr-[5px]'),'Delete Outliers', class="relative font-[arial] w-[full] text-[#8c07da] font-[bold] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                                   wellPanel(tags$p("This action will remove Outdata Value and And replace them by the mean of each attribute accordind to it region"),
+                                             actionButton("confirm","Validate") ),
+                                   class='w-[25vw] h-[50vh] border-[1px] relative left-[13%] top-[15px] border-[#8c07da] text-[#333] font-[bold] text-[20px] font-[arial] rounded-[10px]')
+                               ),textOutput("conf")
+                       
+                               ))
               )),mainPanel(
                 tags$div(class="grid grid-cols-2 gap-4 mt-[40px]",
                          tags$div(class="w-[400px] h-[500px] border-[1px] mr-[10vw] p-[10px] rounded-[10px] ",
@@ -307,8 +318,21 @@ server <- function(input, output) {
     boxxxxxxx=box6+scale_color_brewer(palette = "Dark2")
     plot(boxxxxxxx)
   })
-  
+  #mean(iris["Sepal.Length"][iris$Sepal.Length>6,])
   #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+ 
+  
+  #++++++++++++++++++++++++++++++++++++HANDLING OUTLIERS +++++++++++++++++++++++++++++++++++++++++++++++++#
+
+  output$conf=renderText({
+    #Fresh Outlier
+    input$confirm
+    
+    isolate("Operation Perfomed Successfully")
+  }
+
+    )
+  #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
     output$distPlot <- renderPlot({
        plot(iris$Sepal.Length,iris$Petal.Width)
     })
