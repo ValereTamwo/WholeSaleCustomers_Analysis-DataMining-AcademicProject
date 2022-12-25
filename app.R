@@ -85,16 +85,16 @@ tabsetPanel(
                               
                        tabPanel("Clean Data",tags$div(class='w-full h-[30%]',
                                                       tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Clean Data'),
-                                                      dataTableOutput("data1")
+                                                      dataTableOutput("clean")
                        )),
                        tabPanel("TrainSet",tags$div(class='w-full h-[30%]',
                                                     tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'TrainSet'),
                                                     tags$div(class='relative left-[7vw] w-[100%] h-[100%] p-[10px] mt-[20px]',sliderInput('trainValue','Choose Train Data Size(%)',min = 24,value = 70,max = 100)),
-                                                    dataTableOutput("data2")
+                                                    dataTableOutput("train")
                        )),
                        tabPanel("TestSet",  tags$div(class='w-full h-[30%]',
                                                      tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'TestSet'),
-                                                     dataTableOutput("data3")
+                                                     dataTableOutput("test")
                        ))
                        ),tags$footer(class='w-[98vw] p-[100] h-[70px] right-[5vw] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
                        ))
@@ -103,7 +103,18 @@ tabsetPanel(
   tabPanel("Handle Missing data",sidebarLayout(sidebarPanel (class="mt-[30px]",
     wellPanel("Warning",icon('warning'),class=" text-[20px] text-[red]",
               tags$p(class="w-[full] text-[14px] text-[#333] h-[70px] justify-center items-center p-[10px]","Initially Our DataSet Has no Missing Data"),
-              tags$div(class="w-[80%] left-[1.5vw] p-[10px]  relative h-[40vh] border-[1px] rounded-[10px] text-[17px] text-[#333]",tags$p("Deleting Outliers Value Will bring us missing data"))
+              tags$div(class="w-[80%] left-[1.5vw] p-[10px]  relative h-[40vh] border-[1px] rounded-[10px] text-[17px] text-[#333]",tags$p("Deleting Outliers Value Will bring us missing data for Each attributes : "),
+                       tags$button(id="delete",icon("trash"),"Delete Outlier",class="bg-[red] text-[white] relative left-[20px] top-[23vh] h-[40px] w-[90%] text-[center] rounded-[10px]"),
+                       bsModal(id = 'outdata',title = 'Warning',trigger = 'delete',
+                               wellPanel(
+                                 tags$div(
+                                   tags$h2(icon('warning',class = 'mr-[5px]'),'Delete Outliers', class="relative font-[arial] w-[full] text-[#8c07da] font-[bold] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                                   wellPanel(tags$p("This action will remove Outdata Value and And replace them by the mean of each attribute accordind to it region"),
+                                             actionButton("conf","Validate") ),
+                                   class='w-[25vw] h-[50vh] border-[1px] relative left-[13%] top-[15px] border-[#8c07da] text-[#333] font-[bold] text-[20px] font-[arial] rounded-[10px]')
+                               ),textOutput("conf")
+                       
+                               ))
               )),mainPanel(
                 tags$div(class="grid grid-cols-2 gap-4 mt-[40px]",
                          tags$div(class="w-[400px] h-[500px] border-[1px] mr-[10vw] p-[10px] rounded-[10px] ",
@@ -239,12 +250,49 @@ tabsetPanel(
            )
   ,
   tabPanel("About",
-           sidebarLayout(sidebarPanel('Why is this WholeSale Customers Data has been collected?' , class='mt-[10px]'),mainPanel(
-             tags$div(class='flex position relative right-[400px] gap-[30px]', tags$div(class='w-[40vw] h-[55vh] border-[1px] rounded-[20px] justify-center items-center relative left-[9%] top-[70px]'),
-                      tags$div(class='w-[40vw] h-[55vh] border-[1px] rounded-[20px] justify-center items-center relative left-[9%] top-[70px]'))
+           sidebarLayout(sidebarPanel('Why is this WholeSale Customers Data has been collected?' , class='relative top-[5vh] text-[#333]',wellPanel(class="p-[10px] relative top-[30px]",
+                                                                                                                              # tags$div(class="w-[400px] h-[500px] border-[1px] mr-[10vw] p-[10px] rounded-[10px]",
+                                                                                                                                        tags$h3('Our Goal', icon("arrow-right"),
+                                                                                                                                                class="relative w-[full] text-[#8c07da] text-[20px] h-[40px]   flex items-center justify-center pt-[5px] border-y-[1px]"),
+                                                                                                                                        tags$div(class='w-full h-[50%] text-[#8c07da]  text-[15px]',
+                                                                                                                                                 #plotOutput("distPlot")
+                                                                                                                                                 "We intern to predict the possible Region of a client 
+                                                                                                                                                 according to all his depenses Either his is from ",tags$em("Lisnon . Porto or Other",class="text-[blue]")
+                                                                                                                                        ),
+                                                                                                                              tags$div(class='w-full h-[50%] p-[10px] border-[1px] text-[#333] text-[15px]',
+p("Attribute Information",class='[mb-[20px]') ,
+
+p(" FRESH: annual spending (m.u.) on fresh products (Continuous)"),
+p("MILK: annual spending (m.u.) on milk products (Continuous)"),
+ p("GROCERY: annual spending (m.u.)on grocery products (Continuous)"),
+ p("FROZEN: annual spending (m.u.)on frozen products (Continuous)"),
+ p("DETERGENTS_PAPER: annual spending (m.u.) on detergents and paper products (Continuous)"),
+ p("DELICATESSEN: annual spending (m.u.)on and delicatessen products (Continuous)"),
+ p("CHANNEL: customersâ€™ Channel - Horeca (Hotel/Restaurant/CafÃ©) or Retail channel (Nominal)"),
+ p("REGION: customersâ€™ Region â€“ Lisnon, Oporto or Other (Nominal)" )                                                                                                                                      #plotOutput("distPlot")
+                                                                                                                                       
+                                                                                                                              )
+                                                                                                                              
+                                                                                                                          
+                                                                                                                         #      ) 
+                                                                                                                               )
+                                      ),mainPanel(
+             tags$div(class='flex position relative gap-[30px]',
+                      tags$div(class='w-[40vw] h-[55vh] border-[1px] rounded-[20px] justify-center items-center relative  top-[70px]',
+                               tags$p("Who are we ?",class="relative w-[full] text-[blue] text-[15px] h-[40px]   flex items-center justify-center pt-[5px] border-y-[1px]"),
+                               tags$p(" We are the Group 1 of DataMing project for INF3115 courses" ,class="relative top-[40px] left-[50px]"),
+                               tags$img(src="arrow.png",class="w-[20vw] relative top-[40px] h-[40vh] transform rotate-[150xdeg]" )),
+                      tags$div(class='w-[40vw] h-[55vh] border-[1px] rounded-[20px] justify-center items-center relative  top-[70px]',
+                               tags$p("Contributors",class="relative w-[full] text-[blue] text-[15px] h-[40px]   flex items-center justify-center pt-[5px] border-y-[1px]")
+                               ,tags$div(class="p-[20px] flex justify-center items-center flex-col gap-[50px] pt-[20%]",
+                                         tags$div(class="w-[20vw] rounded-[5px] h-[30%] border-[1px] border-[#8c07da] flex items-center justify-center text-[blue]","TAMWO FEUWO FRANCK VALERE 20U2837"),
+                                         tags$div(class="w-[20vw] rounded-[5px] h-[30%] border-[1px] border-[#8c07da] flex items-center justify-center text-[blue]","NGASSEU NDIFO LYSE PRISCILLE 20U2626"),
+                                         tags$div(class="w-[20vw] rounded-[5px] h-[30%] border-[1px] border-[#8c07da] flex items-center justify-center text-[blue]","BAHAOUDDYN 19T...."))
+                               ))
            )
                          )
-           ,tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
+           ,tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model'),
+                                                                                                                       
            )
            )
   )
@@ -307,8 +355,67 @@ server <- function(input, output) {
     boxxxxxxx=box6+scale_color_brewer(palette = "Dark2")
     plot(boxxxxxxx)
   })
-  
+  #mean(iris["Sepal.Length"][iris$Sepal.Length>6,])
   #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+ 
+  
+  #++++++++++++++++++++++++++++++++++++HANDLING OUTLIERS +++++++++++++++++++++++++++++++++++++++++++++++++#
+
+
+      clean = data
+      #Fresh Outlier
+      
+      clean$Fresh[clean$Fresh>35000&clean$Region==3]=mean(clean$Fresh[clean$Region==3&clean$Fresh<35000])
+      clean$Fresh[clean$Fresh>35000&clean$Region==2]=mean(clean$Fresh[clean$Region==2&clean$Fresh<35000])
+      clean$Fresh[clean$Fresh>35000&clean$Region==1]=mean(clean$Fresh[clean$Region==1&clean$Fresh<35000])
+      
+      #MilK Outlier
+      
+      clean$Milk[clean$Milk>15000&clean$Region==3]=mean(clean$Milk[clean$Region==3&clean$Milk<15000])
+      clean$Milk[clean$Milk>15000&clean$Region==2]=mean(clean$Milk[clean$Region==2&clean$Milk<15000])
+      clean$Milk[clean$Milk>15000&clean$Region==1]=mean(clean$Milk[clean$Region==1&clean$Milk<15000])
+      
+      #Grocery Outlier
+      
+      clean$Grocery[clean$Grocery>24000&clean$Region==3]=mean(clean$Grocery[clean$Region==3&clean$Grocery<24000])
+      clean$Grocery[clean$Grocery>24000&clean$Region==2]=mean(clean$Grocery[clean$Region==2&clean$Grocery<24000])
+      clean$Grocery[clean$Grocery>24000&clean$Region==1]=mean(clean$Grocery[clean$Region==1&clean$Grocery<24000])
+      
+      #Detergent_Paper
+      
+      clean$Detergents_Paper[clean$Detergents_Paper>9500&clean$Region==3]=mean(clean$Detergents_Paper[clean$Region==3&clean$Detergents_Paper<9500])
+      clean$Detergents_Paper[clean$Detergents_Paper>9500&clean$Region==2]=mean(clean$Detergents_Paper[clean$Region==2&clean$Detergents_Paper<9500])
+      clean$Detergents_Paper[clean$Detergents_Paper>9500&clean$Region==1]=mean(clean$Detergents_Paper[clean$Region==1&clean$Detergents_Paper<9500])
+      
+      #Frozen
+      
+      clean$Frozen[clean$Frozen>7000&clean$Region==3]=mean(clean$Frozen[clean$Region==3&clean$Frozen<7000])
+      clean$Frozen[clean$Frozen>7000&clean$Region==2]=mean(clean$Frozen[clean$Region==2&clean$Frozen<7000])
+      clean$Frozen[clean$Frozen>7000&clean$Region==1]=mean(clean$Frozen[clean$Region==1&clean$Frozen<7000])
+      #Delicassen
+      clean$Delicassen[clean$Delicassen>3500&clean$Region==3]=mean(clean$Delicassen[clean$Region==3&clean$Delicassen<3500])
+      clean$Delicassen[clean$Delicassen>3500&clean$Region==2]=mean(clean$Delicassen[clean$Region==2&clean$Delicassen<3500])
+      clean$Delicassen[clean$Delicassen>3500&clean$Region==1]=mean(clean$Delicassen[clean$Region==1&clean$Delicassen<3500])
+      
+      output$conf=renderText({
+        input$conf
+      paste("Operation Performed Sucessfully") 
+  })
+  # OutPut Clean Data 
+  output$clean = renderDataTable(clean,options = list(pageLength=5))
+  #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+  
+  # Setting Train and Test Data 
+  
+  output$train = renderDataTable({
+    train = clean[sample(1:nrow(iris),(input$trainValue*0.01)*nrow(iris)),]
+    
+  })
+  
+  output$test = renderDataTable({
+          test = clean[-sample(1:nrow(iris),(input$trainValue*0.01)*nrow(iris)),]
+    
+  })
     output$distPlot <- renderPlot({
        plot(iris$Sepal.Length,iris$Petal.Width)
     })
