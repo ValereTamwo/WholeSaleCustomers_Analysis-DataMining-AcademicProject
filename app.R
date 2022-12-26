@@ -89,7 +89,8 @@ tabsetPanel(
                        )),
                        tabPanel("TrainSet",tags$div(class='w-full h-[30%]',
                                                     tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'TrainSet'),
-                                                    tags$div(class='relative left-[7vw] w-[100%] h-[100%] p-[10px] mt-[20px]',sliderInput('trainValue','Choose Train Data Size(%)',min = 24,value = 70,max = 100)),
+                                                    tags$div(class='relative left-[7vw] w-[100%] h-[100%] p-[10px] mt-[20px]',
+                                                             sliderInput('traine','Choose Train Data Size(%)',min = 24,value = 70,max = 100)),
                                                     dataTableOutput("train")
                        )),
                        tabPanel("TestSet",  tags$div(class='w-full h-[30%]',
@@ -315,6 +316,7 @@ server <- function(input, output) {
   #+++++++++++++++++Handling Missing Data Vizualising BoxPlot++++++++++++++++++++++++++++++++++# 
   
   output$boxF= renderPlot({
+    data = read.csv('./data/Wholesale customers data (1).csv')
     options(repr.plot.width=9,repr.plot.height=9)
   box1= ggplot(data,aes(x=Fresh,color=Fresh))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
   box=box1+scale_color_brewer(palette = "Dark2")
@@ -322,6 +324,8 @@ server <- function(input, output) {
   })
   
   output$boxM= renderPlot({
+    data = read.csv('./data/Wholesale customers data (1).csv')
+  
     options(repr.plot.width=9,repr.plot.height=9)
     box2= ggplot(data,aes(x=Milk,color=Milk))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
     boxx=box2+scale_color_brewer(palette = "Dark2")
@@ -329,6 +333,8 @@ server <- function(input, output) {
   })
   
   output$boxG= renderPlot({
+    data = read.csv('./data/Wholesale customers data (1).csv')
+    
     options(repr.plot.width=9,repr.plot.height=9)
     box3= ggplot(data,aes(x=Grocery,color=Grocery))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
     boxxx=box3+scale_color_brewer(palette = "Dark2")
@@ -336,6 +342,8 @@ server <- function(input, output) {
   })
   
   output$boxD= renderPlot({
+    data = read.csv('./data/Wholesale customers data (1).csv')
+    
     options(repr.plot.width=9,repr.plot.height=9)
     box4= ggplot(data,aes(x=Detergents_Paper,color=Detergents_Paper))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
     boxxxx=box4+scale_color_brewer(palette = "Dark2")
@@ -343,6 +351,8 @@ server <- function(input, output) {
   })
   
   output$boxFr= renderPlot({
+    data = read.csv('./data/Wholesale customers data (1).csv')
+    
     options(repr.plot.width=9,repr.plot.height=9)
     box5= ggplot(data,aes(x=Frozen,color=Frozen))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
     boxxxxx=box5+scale_color_brewer(palette = "Dark2")
@@ -350,6 +360,8 @@ server <- function(input, output) {
   })
   
   output$boxDe= renderPlot({
+    data = read.csv('./data/Wholesale customers data (1).csv')
+    
     options(repr.plot.width=9,repr.plot.height=9)
     box6= ggplot(data,aes(x=Delicassen,color=Delicassen))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
     boxxxxxxx=box6+scale_color_brewer(palette = "Dark2")
@@ -361,61 +373,74 @@ server <- function(input, output) {
   
   #++++++++++++++++++++++++++++++++++++HANDLING OUTLIERS +++++++++++++++++++++++++++++++++++++++++++++++++#
 
-
-      clean = data
-      #Fresh Outlier
-      
-      clean$Fresh[clean$Fresh>35000&clean$Region==3]=mean(clean$Fresh[clean$Region==3&clean$Fresh<35000])
-      clean$Fresh[clean$Fresh>35000&clean$Region==2]=mean(clean$Fresh[clean$Region==2&clean$Fresh<35000])
-      clean$Fresh[clean$Fresh>35000&clean$Region==1]=mean(clean$Fresh[clean$Region==1&clean$Fresh<35000])
-      
-      #MilK Outlier
-      
-      clean$Milk[clean$Milk>15000&clean$Region==3]=mean(clean$Milk[clean$Region==3&clean$Milk<15000])
-      clean$Milk[clean$Milk>15000&clean$Region==2]=mean(clean$Milk[clean$Region==2&clean$Milk<15000])
-      clean$Milk[clean$Milk>15000&clean$Region==1]=mean(clean$Milk[clean$Region==1&clean$Milk<15000])
-      
-      #Grocery Outlier
-      
-      clean$Grocery[clean$Grocery>24000&clean$Region==3]=mean(clean$Grocery[clean$Region==3&clean$Grocery<24000])
-      clean$Grocery[clean$Grocery>24000&clean$Region==2]=mean(clean$Grocery[clean$Region==2&clean$Grocery<24000])
-      clean$Grocery[clean$Grocery>24000&clean$Region==1]=mean(clean$Grocery[clean$Region==1&clean$Grocery<24000])
-      
-      #Detergent_Paper
-      
-      clean$Detergents_Paper[clean$Detergents_Paper>9500&clean$Region==3]=mean(clean$Detergents_Paper[clean$Region==3&clean$Detergents_Paper<9500])
-      clean$Detergents_Paper[clean$Detergents_Paper>9500&clean$Region==2]=mean(clean$Detergents_Paper[clean$Region==2&clean$Detergents_Paper<9500])
-      clean$Detergents_Paper[clean$Detergents_Paper>9500&clean$Region==1]=mean(clean$Detergents_Paper[clean$Region==1&clean$Detergents_Paper<9500])
-      
-      #Frozen
-      
-      clean$Frozen[clean$Frozen>7000&clean$Region==3]=mean(clean$Frozen[clean$Region==3&clean$Frozen<7000])
-      clean$Frozen[clean$Frozen>7000&clean$Region==2]=mean(clean$Frozen[clean$Region==2&clean$Frozen<7000])
-      clean$Frozen[clean$Frozen>7000&clean$Region==1]=mean(clean$Frozen[clean$Region==1&clean$Frozen<7000])
-      #Delicassen
-      clean$Delicassen[clean$Delicassen>3500&clean$Region==3]=mean(clean$Delicassen[clean$Region==3&clean$Delicassen<3500])
-      clean$Delicassen[clean$Delicassen>3500&clean$Region==2]=mean(clean$Delicassen[clean$Region==2&clean$Delicassen<3500])
-      clean$Delicassen[clean$Delicassen>3500&clean$Region==1]=mean(clean$Delicassen[clean$Region==1&clean$Delicassen<3500])
-      
-      output$conf=renderText({
+cleaning = function(){
+  clean = read.csv('data/Wholesale customers data (1).csv')
+  #Fresh Outlier
+  
+  clean$Fresh[clean$Fresh>35000&clean$Region==3]=mean(clean$Fresh[clean$Region==3&clean$Fresh<35000])
+  clean$Fresh[clean$Fresh>35000&clean$Region==2]=mean(clean$Fresh[clean$Region==2&clean$Fresh<35000])
+  clean$Fresh[clean$Fresh>35000&clean$Region==1]=mean(clean$Fresh[clean$Region==1&clean$Fresh<35000])
+  
+  #MilK Outlier
+  
+  clean$Milk[clean$Milk>15000&clean$Region==3]=mean(clean$Milk[clean$Region==3&clean$Milk<15000])
+  clean$Milk[clean$Milk>15000&clean$Region==2]=mean(clean$Milk[clean$Region==2&clean$Milk<15000])
+  clean$Milk[clean$Milk>15000&clean$Region==1]=mean(clean$Milk[clean$Region==1&clean$Milk<15000])
+  
+  #Grocery Outlier
+  
+  clean$Grocery[clean$Grocery>24000&clean$Region==3]=mean(clean$Grocery[clean$Region==3&clean$Grocery<24000])
+  clean$Grocery[clean$Grocery>24000&clean$Region==2]=mean(clean$Grocery[clean$Region==2&clean$Grocery<24000])
+  clean$Grocery[clean$Grocery>24000&clean$Region==1]=mean(clean$Grocery[clean$Region==1&clean$Grocery<24000])
+  
+  #Detergent_Paper
+  
+  clean$Detergents_Paper[clean$Detergents_Paper>9500&clean$Region==3]=mean(clean$Detergents_Paper[clean$Region==3&clean$Detergents_Paper<9500])
+  clean$Detergents_Paper[clean$Detergents_Paper>9500&clean$Region==2]=mean(clean$Detergents_Paper[clean$Region==2&clean$Detergents_Paper<9500])
+  clean$Detergents_Paper[clean$Detergents_Paper>9500&clean$Region==1]=mean(clean$Detergents_Paper[clean$Region==1&clean$Detergents_Paper<9500])
+  
+  #Frozen
+  
+  clean$Frozen[clean$Frozen>7000&clean$Region==3]=mean(clean$Frozen[clean$Region==3&clean$Frozen<7000])
+  clean$Frozen[clean$Frozen>7000&clean$Region==2]=mean(clean$Frozen[clean$Region==2&clean$Frozen<7000])
+  clean$Frozen[clean$Frozen>7000&clean$Region==1]=mean(clean$Frozen[clean$Region==1&clean$Frozen<7000])
+  #Delicassen
+  clean$Delicassen[clean$Delicassen>3500&clean$Region==3]=mean(clean$Delicassen[clean$Region==3&clean$Delicassen<3500])
+  clean$Delicassen[clean$Delicassen>3500&clean$Region==2]=mean(clean$Delicassen[clean$Region==2&clean$Delicassen<3500])
+  clean$Delicassen[clean$Delicassen>3500&clean$Region==1]=mean(clean$Delicassen[clean$Region==1&clean$Delicassen<3500])
+  
+  return(clean)
+}
+        output$conf=renderText({
         input$conf
       paste("Operation Performed Sucessfully") 
   })
   # OutPut Clean Data 
-  output$clean = renderDataTable(clean,options = list(pageLength=5))
+  output$clean = renderDataTable({
+    cleanData = cleaning()
+    
+  },options =list(pageLength=5))
   #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
   
   # Setting Train and Test Data 
-  
-  output$train = renderDataTable({
-    train = clean[sample(1:nrow(iris),(input$trainValue*0.01)*nrow(iris)),]
-    
+  split_data=reactive({
+     cleanS = cleaning()
+     percent = input$traine*0.01
+     nt = sample(1:nrow(cleanS),percent*nrow(cleanS))
+     return(nt)
   })
+  output$train = renderDataTable({
+    clean = cleaning()
+    nt=split_data()
+    train = clean[nt,]
+    
+  },options =list(pageLength=5))
   
   output$test = renderDataTable({
-          test = clean[-sample(1:nrow(iris),(input$trainValue*0.01)*nrow(iris)),]
-    
-  })
+    clean = cleaning()
+    nt=split_data()
+    test = clean[-nt,]    
+  },options =list(pageLength=5))
     output$distPlot <- renderPlot({
        plot(iris$Sepal.Length,iris$Petal.Width)
     })
