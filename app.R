@@ -254,9 +254,18 @@ tabsetPanel(
     tabPanel("Statistical Analysis",
       sidebarLayout(
         sidebarPanel(wellPanel(tags$h2(class="text-[#8c07da] text-[17px]", "HeatMap Correlation plot"),
-                               tags$div(class="w-full p-[10px] h-[70%] rounded-[15%] ",plotOutput("heat"),tags$p("Analisis")
+                               tags$div(class="w-full p-[10px] h-[70%] rounded-[15%] ",plotOutput("heat"),tags$div(class="w-[90%] mt-[30px] h-[30vh] rounded-[10px] border-[blue] border-[1px] p-[10px]","Analisis")
                                         )
-                               )),mainPanel(dataTableOutput("sum")),position = c("left")
+                               )),mainPanel(
+                                 tags$div(class='w-[100%] h-[30%]',
+                                          tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Position Statistics'),
+                                          dataTableOutput("sum")
+                                 ),
+                                 tags$div(class='w-[100%] h-[30%]',
+                                          tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Dispersion Statistics'),
+                                          dataTableOutput("sum2")
+                                 )
+                                 ),position = c("left")
                                                              ),
            tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative  text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model') ))
            ),
@@ -269,7 +278,8 @@ tabsetPanel(
              tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Correlation matrix with Value >= 0.5'),
              dataTableOutput("data6")
     )
-    )))
+    )
+    ))
   ,
   tabPanel("About",
            sidebarLayout(sidebarPanel('Why is this WholeSale Customers Data has been collected?' , class='relative top-[5vh] text-[#333]',wellPanel(class="p-[10px] relative top-[30px]",
@@ -465,7 +475,7 @@ cleaning = function(){
     output$distPlot <- renderPlot({
        plot(iris$Sepal.Length,iris$Petal.Width)
     })
-    #Matrice de correlation pour les attributs pertinents
+    # ---------------Matrice de correlation pour les attributs pertinents
     library(reshape2)
     dataC = read.csv('./data/Wholesale customers data (1).csv')
     cormat=round(cor(dataC),2)
@@ -475,15 +485,31 @@ cleaning = function(){
     output$data6 = renderDataTable(corrA, options = list(pageLength = 5))
     
     # HeapMap de la Matrice des Correlations
-    heat=ggplot(data = melted_cormat,aes(x = Var1,y=Var2,fill=value))+geom_tile(colour="whitesmoke")+ scale_fill_gradient2(low = "violet", high = "blue", mid = "white", 
+    heat=ggplot(data = melted_cormat,aes(x = Var1,y=Var2,fill=value))+geom_tile(colour="whitesmoke")+ scale_fill_gradient2(low = "violet", high = "blue", mid = "whitesmoke", 
                                                                                                                            midpoint = 0, limit = c(-1,1), space = "Lab",
                                                                                                                            name="Pearson\nCorrelation")
     uiPlot=plot(heat)
    output$heat<-renderPlot(uiPlot)
-   #Resume
-     output$sum = renderDataTable({
+   
+   #--------------------------Resumer des Donnees ---------------
+   
+     attrib = c("Channel","Region","Fresh","Milk","Grocery","Frozen","Detergents_Paper","Delicassen")
+     
+     Channel=c(paste("variance: ",round(var(dataC$Channel)),2),paste("Ecart-Type: ",round(sd(dataC$Channel),2)),paste("Mean :",round(mean(dataC$Channel))))
+     Region=c(paste("variance: ",var(dataC$Region)),paste("Ecart-Type: ",sd(dataC$Region)),paste("Mean :",mean(dataC$Region)))
+     Fresh=c(paste("variance: ",var(dataC$Fresh)),paste("Ecart-Type: ",sd(dataC$Fresh)),paste("Mean :",mean(dataC$Fresh)))
+     Milk=c(paste("variance: ",var(dataC$Milk)),paste("Ecart-Type: ",sd(dataC$ Milk)),paste("Mean :",mean(dataC$Milk)))
+     Grocery=c(paste("variance: ",var(dataC$Grocery)),paste("Ecart-Type: ",sd(dataC$Grocery)),paste("Mean :",mean(dataC$Grocery)))
+     Frozen=c(paste("variance: ",var(dataC$Frozen)),paste("Ecart-Type: ",sd(dataC$Frozen)),paste("Mean :",mean(dataC$Frozen)))
+     Detergents_Paper=c(paste("variance: ",var(dataC$Detergents_Paper)),paste("Ecart-Type: ",sd(dataC$Detergents_Paper)),paste("Mean :",mean(dataC$Detergents_Paper)))
+     Delicassen=c(paste("variance: ",var(dataC$Delicassen)),paste("Ecart-Type: ",sd(dataC$Delicassen)),paste("Mean :",mean(dataC$Delicassen)))
+     
+     df = data.frame(Channel,Region,Fresh,Milk,Grocery,Frozen,Detergents_Paper,Delicassen)
+
+      output$sum = renderDataTable({
        summary(dataC)
      })
+     output$sum2=renderDataTable(df,options = list(pageLength=5))
     
 }
 
