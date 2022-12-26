@@ -11,6 +11,9 @@ library(shiny)
 library(shiny.tailwind)
 library(shinydashboard)
 library(shinyBS)
+library(corrplot)
+
+
 options(shiny.launch.browser = .rs.invokeShinyWindowExternal)
 
 # Define UI for application that draws a histogram
@@ -88,7 +91,7 @@ tabsetPanel(
                                                       dataTableOutput("clean")
                        )),
                        tabPanel("TrainSet",tags$div(class='w-full h-[30%]',
-                                                    tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'TrainSet'),
+                                                    tags$h2( class="relative w-[80vw] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'TrainSet'),
                                                     tags$div(class='relative left-[7vw] w-[100%] h-[100%] p-[10px] mt-[20px]',
                                                              sliderInput('traine','Choose Train Data Size(%)',min = 24,value = 70,max = 100)),
                                                     dataTableOutput("train")
@@ -246,9 +249,27 @@ tabsetPanel(
            )
            )
            ),
-  tabPanel("Relevant Attributes",sidebarLayout(sidebarPanel(wellPanel(tags$h2(class="text-[#8c07da] text-[17px]", "Correlation plot"),tags$div(class="",tags$p("Analisis")))),mainPanel(dataTableOutput("")),position = c("left")),
-           tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[90vh] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model') ))
-           )
+  tabPanel("Relevant Attributes",
+           tabsetPanel(
+    tabPanel("Statistical Analysis",
+      sidebarLayout(
+        sidebarPanel(wellPanel(tags$h2(class="text-[#8c07da] text-[17px]", "HeatMap Correlation plot"),
+                               tags$div(class="w-full p-[10px] h-[70%] rounded-[15%] ",plotOutput("heat"),tags$p("Analisis")
+                                        )
+                               )),mainPanel(dataTableOutput("sum")),position = c("left")
+                                                             ),
+           tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative  text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model') ))
+           ),
+    tabPanel("Correlation matrix",
+             tags$div(class='w-[90vw] h-[30%]',
+                                           tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Correlation matrix'),
+                                           dataTableOutput("data5")
+    ),
+    tags$div(class='w-[90vw] h-[30%]',
+             tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Correlation matrix with Value >= 0.5'),
+             dataTableOutput("data6")
+    )
+    )))
   ,
   tabPanel("About",
            sidebarLayout(sidebarPanel('Why is this WholeSale Customers Data has been collected?' , class='relative top-[5vh] text-[#333]',wellPanel(class="p-[10px] relative top-[30px]",
@@ -444,6 +465,26 @@ cleaning = function(){
     output$distPlot <- renderPlot({
        plot(iris$Sepal.Length,iris$Petal.Width)
     })
+    #Matrice de correlation pour les attributs pertinents
+    library(reshape2)
+    dataC = read.csv('./data/Wholesale customers data (1).csv')
+    cormat=round(cor(dataC),2)
+    melted_cormat = melt(cormat)
+    corrA = melted_cormat[melted_cormat$value>=0.5,]
+    output$data5 = renderDataTable(melted_cormat, options = list(pageLength = 5))
+    output$data6 = renderDataTable(corrA, options = list(pageLength = 5))
+    
+    # HeapMap de la Matrice des Correlations
+    heat=ggplot(data = melted_cormat,aes(x = Var1,y=Var2,fill=value))+geom_tile(colour="whitesmoke")+ scale_fill_gradient2(low = "violet", high = "blue", mid = "white", 
+                                                                                                                           midpoint = 0, limit = c(-1,1), space = "Lab",
+                                                                                                                           name="Pearson\nCorrelation")
+    uiPlot=plot(heat)
+   output$heat<-renderPlot(uiPlot)
+   #Resume
+     output$sum = renderDataTable({
+       summary(dataC)
+     })
+    
 }
 
 # Run the application 
