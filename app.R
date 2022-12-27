@@ -13,10 +13,8 @@ library(shinydashboard)
 library(shinyBS)
 library(corrplot)
 
-
 options(shiny.launch.browser = .rs.invokeShinyWindowExternal)
 
-# Define UI for application that draws a histogram
 ui <- fluidPage(
   use_tailwind(),
   includeCSS('./style.css'),tags$header(
@@ -385,7 +383,8 @@ server <- function(input, output) {
     data = read.csv('./data/Wholesale customers data (1).csv')
     
     options(repr.plot.width=9,repr.plot.height=9)
-    box5= ggplot(data,aes(x=Frozen,color=Frozen))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
+
+        box5= ggplot(data,aes(x=Frozen,color=Frozen))+geom_boxplot(outlier.colour = "#8c07da",outlier.shape = 16,outlier.size = 2,fill="white")
     boxxxxx=box5+scale_color_brewer(palette = "Dark2")
     plot(boxxxxx)
   })
