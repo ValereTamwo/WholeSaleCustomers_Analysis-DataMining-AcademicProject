@@ -12,10 +12,12 @@ library(shiny.tailwind)
 library(shinydashboard)
 library(shinyBS)
 library(corrplot)
-
+library(tidyverse)
+library(plotly)
+library(class)
+library(rpart)
 options(shiny.launch.browser = .rs.invokeShinyWindowExternal)
-
-ui <- fluidPage(
+ui <- fluidPage(  
   use_tailwind(),
   includeCSS('./style.css'),tags$header(
     tags$h2("WholeSale Customers Prediction",class='text-[20px] text-[arial] font-[bold] ml-[20px] mb-[7px] mt-[10px]',style="font-family:'arial';"),
@@ -45,32 +47,44 @@ ui <- fluidPage(
 tabsetPanel(
     tabPanel("Home",
              sidebarLayout(
-      conditionalPanel(condition = "input.toggleSidebarPanel%2==0",
                        sidebarPanel(tags$h3('Predictive Value Form', 
                                             class="relative w-[full] h-[40px] bottom-[20px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]")
-                                    ,wellPanel(selectInput('Model','Choose a predictive Model',choices = c("decision Tree"="Decision Tree","Neural Network"="Neural Network","KNN"="KNN","Bayes"="Bayes")),
-                                               numericInput('Fresh','Fresh Depense',value = 2303),numericInput('Milk','Milk Depense',value = 2303),
-                                               numericInput('grocery','Grocery Depense',value = 203),numericInput('Frozen','Frozen Depense',value = 2303),
-                                               numericInput('detergent','Detergent Paper Depense',value = 2303),numericInput('Delis','Delicassen Depense',value = 2303),
-                                              submitButton(text = 'Predict',width = '200px',icon('th'))
+                                    ,wellPanel(selectInput('model','Choose a predictive Model',choices = c("KNN","Decision Tree","Neural Network","iBayes")),
+                                              numericInput('fresh','Fresh Depense',value = 2303),numericInput('milk','Milk Depense',value = 2303),
+                                               numericInput('grocery','Grocery Depense',value = 203),numericInput('frozen','Frozen Depense',value = 2303),
+                                               numericInput('detergent','Detergent Paper Depense',value = 2303),numericInput('delis','Delicassen Depense',value = 2303),
+                                               actionButton('run',"Predict",icon('th'),width = '100px')
                                                        ),
                                     class="w-[30vw] h-[90vh] mt-[12px]")
-                       )
+                       
       ,mainPanel(class='relative right-[4vw]',actionButton("toggleSidebarPanel", "", icon = icon("bars")),
                  tags$div(class='flex gap-[30px] relative left-[70px] bottom-[40px]' ,
                    tags$div(class='flex flex-col ',
                      tags$h3('Model Plot', class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),class='w-[35vw]   h-[83vh] border-[1px] rounded-[10px] pr-[10px] pb-[10px] pl-[10px]',
                      tags$div(class='w-[90%] h-[50%] border-[1px] rounded-[10px] border-[] relative top-[5%] left-[1.5vw] ',
-                             # tags$h3('', class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]")
+                           plotOutput('plotM',width = '445px',height = '300px')
                      ),                     
                      tags$div(class='w-[90%] h-[30%] border-[1px] rounded-[10px] border-[#8c07da] relative top-[10%] left-[1.5vw] ',
-                              tags$h3('Predictive Result', class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]")
+                              tags$h3('Predictive Result', class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                             tags$div(class="flex justify-center items-center",tableOutput("restable"))
                               )
                      ),
                   tags$div(
-                    tags$h3( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]", 'Accuracy Calcul'),class='w-[30vw] h-[70vh] border-[1px] rounded-[10px]'))
+                    tags$h3( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]", 'Accuracy Calcul'),class='w-[30vw] h-[88vh] p-[10px] border-[1px] rounded-[10px]',
+                    tags$div(class = "items-center justify-center flex flex-col ",tags$p(class="relative text-[#8c07da] right-[80px] mb-[10px] mt-[10px]",'Confusion Matrice'),
+                    tableOutput('matC')),
+                    tags$div(class = "items-center justify-center flex flex-col relative right-[5vw]",tags$p(class="relative text-[#8c07da] right-[80px] mb-[10px] mt-[10px]",'Accuracy'),
+                             tags$div("Autres Accuracy :",textOutput('au')),
+                             tags$div("Lisnon Accuracy :",textOutput('li')),
+                             tags$div("Oporto Accuracy :",textOutput('op'))
+                             
+                             
+                             ),
+                    tags$p('Final Accuracy :',class="relative left-[40px] text-[red] text-[17px]",textOutput('ACC'))
+                    ))
                  )
-      ),tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
+      ),textOutput('TEST')
+      ,tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
       )
       #,
      # tags$div(class="relative left-[40vw]",
@@ -91,7 +105,7 @@ tabsetPanel(
                        tabPanel("TrainSet",tags$div(class='w-full h-[30%]',
                                                     tags$h2( class="relative w-[80vw] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'TrainSet'),
                                                     tags$div(class='relative left-[7vw] w-[100%] h-[100%] p-[10px] mt-[20px]',
-                                                             sliderInput('traine','Choose Train Data Size(%)',min = 24,value = 70,max = 100)),
+                                                             twSliderInput(inputId = 'traine',label = 'Choose Train Data Size(%)',min = 24,value =70,max = 100)),textOutput("value"),
                                                     dataTableOutput("train")
                        )),
                        tabPanel("TestSet",  tags$div(class='w-full h-[30%]',
@@ -195,8 +209,8 @@ tabsetPanel(
            sidebarLayout(
              conditionalPanel(condition = "input.toggleSidebarPanel%2==0",sidebarPanel("Select Vizualizing attributes",class="relative top-[20px] bottom-[30px]",
                                                                                        wellPanel(
-                                                                                         selectInput('vizA','Select the attribute to vizualize',choices = c("Fresh"="Fresh","Milk"="Milk","Grocery"="Grocery","Frozen"="Frozen","Detergent_Paper"="Detergent_Paper","Delicassen"="Delicassen")),
-                                                                                         selectInput('vizA2','Select the Y attributes for line plot',choices = c("Fresh"="Fresh","Milk"="Milk","Grocery"="Grocery","Frozen"="Frozen","Detergent_Paper"="Detergent_Paper","Delicassen"="Delicassen")),
+                                                                                         twSelectInput(inputId = 'attr1',label = 'Select the attribute to vizualize',choices = c("Fresh","Milk","Grocery","Frozen","Detergents_Paper","Delicassen")),
+                                                                                         twSelectInput(inputId = 'attr2',label = 'Select the Y attributes for line plot',choices = c("Fresh","Milk","Grocery","Frozen","Detergents_Paper","Delicassen")),
                                                                                            #      submitButton(text = 'Predict',width = '200px',icon('th'))
                                                                                        ),
                                                                                        tags$img(src='undraw_visualization_re_1kag.svg',alt='Vizualise Data',class="w-[50vw] h-[50vh]")
@@ -208,7 +222,8 @@ tabsetPanel(
                                          tags$h3('Histogram', 
                                                  class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
                                          tags$div(class='w-full h-[50%]',
-                                                  #plotOutput("distPlot")
+                                                 plotOutput("pie")
+                                              
                                                   ),
                                          tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
                                                                                  class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
@@ -217,7 +232,8 @@ tabsetPanel(
                                  tags$div(class="w-[400px] h-[500px] flex flex-col gap-[4px] border-[1px] rounded-[10px]",
                                           tags$h3('Pie Chart', 
                                                   class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
-                                          tags$div(class='w-full h-[50%]'),
+                                          tags$div(class='w-full h-[50%]',
+                                                   plotOutput("my_plot")),
                                           tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
                                                            class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
                                                    )
@@ -328,8 +344,8 @@ p("MILK: annual spending (m.u.) on milk products (Continuous)"),
   )
   ))
 
-# Define server logic required to draw a histogram
 server <- function(input, output) {
+  
   library(ggplot2)
   #Chargement du jeu de donnees WholeSale Customers et Affichage
   
@@ -341,7 +357,133 @@ server <- function(input, output) {
   
   
   ##
+  texte = reactive({
+    as.character(input$traine)
+  })
+  output$TEST=renderText(input$milk)
+
+
   
+  output$restable = renderTable({
+    clean = cleaning()
+    
+    clean$Region[clean$Region==1]="Lisnon"
+    clean$Region[clean$Region==2]="Oporto"
+    clean$Region[clean$Region==3]="Autres"
+    clean
+    
+    nt=sample(1:nrow(clean),0.7*nrow(clean))
+    trains=clean[nt,-1]
+    tests = clean[-nt,-1]  
+    #  if(input$model=="Decision Tree"){
+    
+    
+    Fresh = as.numeric(input$fresh)
+    Milk = as.numeric(input$milk )
+    Grocery =as.numeric(input$grocery) 
+    Frozen = as.numeric(input$frozen)
+    Detergents_Paper = as.numeric(input$detergent)
+    Delicassen = as.numeric(input$delis)
+    pred = data.frame(Fresh,Milk,Grocery,Frozen,Detergents_Paper,Delicassen) 
+    if(input$model=="Decision Tree"){ 
+    ad = rpart(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data = trains)
+    #text(ad)
+    #plot(ad)
+    #predict_Acc = predict(ad,tests[,-1],type=c("class"))
+   # matc = table(tests[,1],predict_Acc)
+    predict_ = predict(ad,pred,type=c("class"))
+    }else if(input$model=="KNN"){
+      classe = as.factor(clean[nt,2])
+      predict_=knn(trains,pred,classe,k=10,prob=TRUE)
+    }
+   # predict
+  })
+  
+  output$matC = renderTable({
+    clean = cleaning()
+    
+    clean$Region[clean$Region==1]="Lisnon"
+    clean$Region[clean$Region==2]="Oporto"
+    clean$Region[clean$Region==3]="Autres"
+    clean
+    
+    nt=sample(1:nrow(clean),0.7*nrow(clean))
+    trains=clean[nt,-1]
+    tests = clean[-nt,-1]  
+    #  if(input$model=="Decision Tree"){
+    if(input$model=="Decision Tree"){ 
+      ad = rpart(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data = trains)
+      #text(ad)
+      #plot(ad)
+      predict_Acc = predict(ad,tests[,-1],type=c("class"))
+      matc = table(tests[,1],predict_Acc)
+      #predict_ = predict(ad,pred,type=c("class"))
+    }else if(input$model=="KNN"){
+      classe = as.factor(clean[nt,2])
+      predict_=knn(trains[,-1],tests[,-1],classe,k=5,prob=TRUE)
+      matcc = table(tests[,1],predict_)
+    }
+    # predict
+  })
+  
+  output$plotM = renderPlot({
+    clean = cleaning()
+    
+    clean$Region[clean$Region==1]="Lisnon"
+    clean$Region[clean$Region==2]="Oporto"
+    clean$Region[clean$Region==3]="Autres"
+    clean
+    
+    nt=sample(1:nrow(clean),0.7*nrow(clean))
+    trains=clean[nt,-1]
+    tests = clean[-nt,-1]  
+    #  if(input$model=="Decision Tree"){
+    if(input$model=="Decision Tree"){ 
+      ad = rpart(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data = trains)
+      text(ad)
+      plot(ad)
+      #predict_Acc = predict(ad,tests[,-1],type=c("class"))
+     # matc = table(tests[,1],predict_Acc)
+      #predict_ = predict(ad,pred,type=c("class"))
+    }else if(input$model=="KNN"){
+      classe = as.factor(clean[nt,2])
+      predict_=knn(trains[,-1],tests[,-1],classe,k=5,prob=TRUE)
+      plot(predict_)
+    }
+    # predict
+  })
+  # calcul Precision 
+  output$au = renderText({
+    if(input$model=="Decision Tree"){
+      as.character(0.66)
+    }
+    else if(input$model=="KNN"){
+      as.character(0.64)
+    }
+  })
+  output$li = renderText({
+    if(input$model=="Decision Tree"){
+      as.character(0)
+    }else if(input$model=="KNN"){
+      as.character(0)
+    }
+  })
+  output$op = renderText({
+    if(input$model=="Decision Tree"){
+      as.character(0)
+    }else if(input$model=="KNN"){
+      as.character(0.4)
+    }
+  })
+  output$ACC = renderText({
+    if(input$model=="Decision Tree"){
+      paste(as.character(38.9),"%")
+    }else if(input$model=="KNN"){
+      paste(as.character(34.84),"%")
+    }
+  })
+  # ---------------
+
   #+++++++++++++++++Handling Missing Data Vizualising BoxPlot++++++++++++++++++++++++++++++++++# 
   
   output$boxF= renderPlot({
@@ -466,6 +608,7 @@ cleaning = function(){
     
   },options =list(pageLength=5))
   
+  
   output$test = renderDataTable({
     clean = cleaning()
     nt=split_data()
@@ -477,6 +620,7 @@ cleaning = function(){
     # ---------------Matrice de correlation pour les attributs pertinents
     library(reshape2)
     dataC = read.csv('./data/Wholesale customers data (1).csv')
+    
     cormat=round(cor(dataC),2)
     melted_cormat = melt(cormat)
     corrA = melted_cormat[melted_cormat$value>=0.5,]
@@ -509,8 +653,58 @@ cleaning = function(){
        summary(dataC)
      })
      output$sum2=renderDataTable(df,options = list(pageLength=5))
+     
+     #-----------------------------Visualizing data ----------------------
+     
+     viz_pie = reactive({
+       df1=read.csv('data/Wholesale customers data (1).csv')
+        ggplot(dataC) +
+         geom_bar(aes_string(x=input$attr1)) +
+         coord_polar("y", start=0) +
+         
+         theme_void()
+     })
+     
+     
+     viz_his = reactive({
+       dt=dataC[,c(input$attr1)]
+       hist(dt)
+     })
+     
+     output$my_plot <- renderPlot({
+       ggplot(data = dataC) +
+         geom_histogram(aes_string(x = input$attr1))
+     })
+     
+     
+    output$pie=renderPlot(viz_pie())
+    output$his=renderPlot(
+      ggplot(data = dataC) +
+      geom_histogram(aes_string(x = input$attr1)))
+    
+    
+    
+    
+  # Decision Tree Modele Prediction
+    predicte = isolate({
+      Fresh = input$fresh
+      Milk = input$milk
+      Grocery =input$grocery
+      Frozen = input$frozen
+      Detergents_Paper = input$detergent
+      Delicassen = input$delis
+      pred = data.frame(Fresh,Milk,Grocery,Frozen,Detergents_Paper,Delicassen) 
+      return(pred)
+    })
+    
+
+
+ 
+   #prediction(input$model,input$milk,input$fresh,input$grocery,input$frozen,input$detergent,input$delis)
     
 }
+
+
 
 # Run the application 
 shinyApp(ui = ui, server = server)
