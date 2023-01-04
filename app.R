@@ -69,7 +69,21 @@ tabsetPanel(
                               )
                      ),
                   tags$div(
-                    tags$h3( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]", 'Accuracy Calcul'),class='w-[30vw] h-[70vh] border-[1px] rounded-[10px]'))
+                    tags$h3( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]", 'Accuracy Calcul'),class='w-[30vw] h-[88vh] p-[10px] border-[1px] rounded-[10px]',
+                    tags$div(class = " w-[27vw] h-[50%] ",
+                             #tags$p(class="relative text-[#8c07da] right-[80px] mb-[10px] mt-[10px]",'Confusion Matrice'),
+                   # tableOutput('matC')
+                   verbatimTextOutput("matC")
+                    ),
+                #    tags$div(class = "items-center justify-center flex flex-col relative right-[5vw]",tags$p(class="relative text-[#8c07da] right-[80px] mb-[10px] mt-[10px]",'Accuracy'),
+                 #            tags$div("Autres Accuracy :",textOutput('au')),
+                  #           tags$div("Lisnon Accuracy :",textOutput('li')),
+                   #          tags$div("Oporto Accuracy :",textOutput('op'))
+                             
+                             
+                    #         ),
+                   # tags$p('Final Accuracy :',class="relative left-[40px] text-[red] text-[17px]",textOutput('ACC'))
+                    ))
                  )
       ),tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
       )
@@ -353,7 +367,7 @@ p("MILK: annual spending (m.u.) on milk products (Continuous)"),
                                ,tags$div(class="p-[20px] flex justify-center items-center flex-col gap-[50px] pt-[20%]",
                                          tags$div(class="w-[20vw] rounded-[5px] h-[30%] border-[1px] border-[#8c07da] flex items-center justify-center text-[blue]","TAMWO FEUWO FRANCK VALERE 20U2837"),
                                          tags$div(class="w-[20vw] rounded-[5px] h-[30%] border-[1px] border-[#8c07da] flex items-center justify-center text-[blue]","NGASSEU NDIFO LYSE PRISCILLE 20U2626"),
-                                         tags$div(class="w-[20vw] rounded-[5px] h-[30%] border-[1px] border-[#8c07da] flex items-center justify-center text-[blue]","BAHAOUDDYN 19T...."))
+                                         tags$div(class="w-[20vw] rounded-[5px] h-[30%] border-[1px] border-[#8c07da] flex items-center justify-center text-[blue]","BAHAOUDDYN 19M2565"))
                                ))
            )
                          )
@@ -376,8 +390,150 @@ server <- function(input, output) {
   output$data3 = renderDataTable(data,options=list(pageLength=5))
   
   
-  ##
+  output$restable = renderTable({
+    
+    clean = cleaning(data=data)
+    pred = predValues()
+    nt=sample(1:nrow(clean),0.7*nrow(clean))
+    trains=clean[nt,-1]
+    tests = clean[-nt,-1]  
+
+    if(input$model=="Decision Tree"){ 
+      
+    ad = rpart(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data = trains)
+    predict_ = predict(ad,pred,type=c("class"))
+    
+    }else if(input$model=="KNN"){
+      
+      classe = clean[nt,2]
+      predict_=knn(train = trains,test = pred,cl = classe,k=10,prob=TRUE)
+      
+    }else if(input$model=="Neural Network"){
+      nn = neuralnet(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data=trains,hidden=3,act.fct = "logistic",
+                     linear.output = FALSE)
+      #model = nnet(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,trains,size=3)
+      predict= predict(model,pred)
+      
+    }else if(input$model=="SVM"){
+      
+    }
+    
+   # predict
+  })
   
+  output$matC = renderPrint({
+    clean = cleaning(data=data)
+    nt=sample(1:nrow(clean),0.7*nrow(clean))
+    trains=clean[nt,-1]
+    tests = clean[-nt,-1]  
+
+        if(input$model=="Decision Tree"){ 
+          
+      ad = rpart(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data = trains)
+      predict_Acc = predict(ad,tests[,-1],type=c("class"))
+      matc = table(predict_Acc,tests[,1])
+      confusionMatrix(matc)
+    }else if(input$model=="KNN"){
+      
+      classe = as.factor(clean[nt,2])
+      predict_=knn(trains[,-1],tests[,-1],classe,k=5)
+      matcc = table(tests[,1],predict_)
+      confusionMatrix(table(predict_,tests[,1]))
+    }else if(input$model=="Neural Network"){
+      
+      nn = neuralnet(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data=trains,hidden=3,act.fct = "logistic",
+                     linear.output = FALSE)
+      predictNN = compute(nn,tests[,-1])
+      prob = predictNN$net.result
+      pred <- ifelse(prob>0.5, 0,1)
+      #predict_N= predict(model,tests[,-1])
+      
+      matcc = table(pred,tests[,1])
+      
+    }else if(input$model=="SVM"){
+      
+    }
+    # predict
+  })
+  
+  # Afficher les models
+  output$plotM = renderPlot({
+    clean = cleaning(data = data)
+
+    nt=sample(1:nrow(clean),0.7*nrow(clean))
+    trains=clean[nt,-1]
+    tests = clean[-nt,-1]  
+    
+    if(input$model=="Decision Tree"){ 
+      
+      ad = rpart(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data = trains)
+      plot(ad)
+
+    }else if(input$model=="KNN"){
+      
+      classe = as.factor(clean[nt,2])
+      predict_=knn(trains[,-1],tests[,-1],classe,k=5,prob=TRUE)
+      plot(predict_)
+      
+    }else if(input$model=="Neural Network"){
+      nn = neuralnet(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data=trains,hidden=3,act.fct = "logistic",
+                     linear.output = FALSE)
+      plot(nn)
+    }else if(input$model=="SVM"){
+      
+    }
+    # predict
+  })
+  # calcul Precision 
+  output$au = renderText({
+    if(input$model=="Decision Tree"){
+      as.character(0.66)
+    }
+    else if(input$model=="KNN"){
+      as.character(0.64)
+    }else if(input$model=="Neural Network"){
+      
+    }
+    else if(input$model=="SVM"){
+      
+    }
+  })
+  output$li = renderText({
+    if(input$model=="Decision Tree"){
+      as.character(0)
+    }else if(input$model=="KNN"){
+      as.character(0)
+    }else if(input$model=="Neural Network"){
+      
+    }else if(input$model=="SVM"){
+      
+    }
+  })
+  output$op = renderText({
+    if(input$model=="Decision Tree"){
+      as.character(0)
+    }else if(input$model=="KNN"){
+      as.character(0.4)
+    }else if(input$model=="Neural Network"){
+      
+    }else if(input$model=="SVM"){
+      
+    }
+  })
+  output$ACC = renderText({
+    if(input$model=="Decision Tree"){
+      paste(as.character(38.9),"%")
+    }else if(input$model=="KNN"){
+      paste(as.character(34.84),"%")
+    }else if(input$model=="Neural Network"){
+      
+    }else if(input$model=="SVM"){
+      
+    }
+    
+  })
+  # ---------------
+
   #+++++++++++++++++Handling Missing Data Vizualising BoxPlot++++++++++++++++++++++++++++++++++# 
   
   output$boxF= renderPlot({
