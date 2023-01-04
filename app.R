@@ -18,6 +18,7 @@ library(class)
 library(rpart)
 library(nnet)
 library(neuralnet)
+library(caret)
 
 library(ggplot2)
 # charger le jeu de donnee + Preprocessing data
@@ -123,16 +124,19 @@ tabsetPanel(
                      ),
                   tags$div(
                     tags$h3( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]", 'Accuracy Calcul'),class='w-[30vw] h-[88vh] p-[10px] border-[1px] rounded-[10px]',
-                    tags$div(class = "items-center justify-center flex flex-col ",tags$p(class="relative text-[#8c07da] right-[80px] mb-[10px] mt-[10px]",'Confusion Matrice'),
-                    tableOutput('matC')),
-                    tags$div(class = "items-center justify-center flex flex-col relative right-[5vw]",tags$p(class="relative text-[#8c07da] right-[80px] mb-[10px] mt-[10px]",'Accuracy'),
-                             tags$div("Autres Accuracy :",textOutput('au')),
-                             tags$div("Lisnon Accuracy :",textOutput('li')),
-                             tags$div("Oporto Accuracy :",textOutput('op'))
+                    tags$div(class = " w-[27vw] h-[50%] ",
+                             #tags$p(class="relative text-[#8c07da] right-[80px] mb-[10px] mt-[10px]",'Confusion Matrice'),
+                   # tableOutput('matC')
+                   verbatimTextOutput("matC")
+                    ),
+                #    tags$div(class = "items-center justify-center flex flex-col relative right-[5vw]",tags$p(class="relative text-[#8c07da] right-[80px] mb-[10px] mt-[10px]",'Accuracy'),
+                 #            tags$div("Autres Accuracy :",textOutput('au')),
+                  #           tags$div("Lisnon Accuracy :",textOutput('li')),
+                   #          tags$div("Oporto Accuracy :",textOutput('op'))
                              
                              
-                             ),
-                    tags$p('Final Accuracy :',class="relative left-[40px] text-[red] text-[17px]",textOutput('ACC'))
+                    #         ),
+                   # tags$p('Final Accuracy :',class="relative left-[40px] text-[red] text-[17px]",textOutput('ACC'))
                     ))
                  )
       ),textOutput('TEST')
@@ -387,7 +391,7 @@ p("MILK: annual spending (m.u.) on milk products (Continuous)"),
                                ,tags$div(class="p-[20px] flex justify-center items-center flex-col gap-[50px] pt-[20%]",
                                          tags$div(class="w-[20vw] rounded-[5px] h-[30%] border-[1px] border-[#8c07da] flex items-center justify-center text-[blue]","TAMWO FEUWO FRANCK VALERE 20U2837"),
                                          tags$div(class="w-[20vw] rounded-[5px] h-[30%] border-[1px] border-[#8c07da] flex items-center justify-center text-[blue]","NGASSEU NDIFO LYSE PRISCILLE 20U2626"),
-                                         tags$div(class="w-[20vw] rounded-[5px] h-[30%] border-[1px] border-[#8c07da] flex items-center justify-center text-[blue]","BAHAOUDDYN 19T...."))
+                                         tags$div(class="w-[20vw] rounded-[5px] h-[30%] border-[1px] border-[#8c07da] flex items-center justify-center text-[blue]","BAHAOUDDYN 19M2565"))
                                ))
            )
                          )
@@ -430,8 +434,8 @@ server <- function(input, output,session) {
     
     }else if(input$model=="KNN"){
       
-      classe = as.factor(clean[nt,2])
-      predict_=knn(trains,pred,classe,k=10,prob=TRUE)
+      classe = clean[nt,2]
+      predict_=knn(train = trains,test = pred,cl = classe,k=10,prob=TRUE)
       
     }else if(input$model=="Neural Network"){
       nn = neuralnet(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data=trains,hidden=3,act.fct = "logistic",
@@ -446,7 +450,7 @@ server <- function(input, output,session) {
    # predict
   })
   
-  output$matC = renderTable({
+  output$matC = renderPrint({
     clean = cleaning(data=data)
     nt=sample(1:nrow(clean),0.7*nrow(clean))
     trains=clean[nt,-1]
@@ -456,14 +460,14 @@ server <- function(input, output,session) {
           
       ad = rpart(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data = trains)
       predict_Acc = predict(ad,tests[,-1],type=c("class"))
-      matc = table(tests[,1],predict_Acc)
-      
+      matc = table(predict_Acc,tests[,1])
+      confusionMatrix(matc)
     }else if(input$model=="KNN"){
       
       classe = as.factor(clean[nt,2])
-      predict_=knn(trains[,-1],tests[,-1],classe,k=5,prob=TRUE)
+      predict_=knn(trains[,-1],tests[,-1],classe,k=5)
       matcc = table(tests[,1],predict_)
-      
+      confusionMatrix(table(predict_,tests[,1]))
     }else if(input$model=="Neural Network"){
       
       nn = neuralnet(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data=trains,hidden=3,act.fct = "logistic",
@@ -473,7 +477,7 @@ server <- function(input, output,session) {
       pred <- ifelse(prob>0.5, 0,1)
       #predict_N= predict(model,tests[,-1])
       
-      matcc = table(tests[,1],pred)
+      matcc = table(pred,tests[,1])
       
     }else if(input$model=="SVM"){
       
