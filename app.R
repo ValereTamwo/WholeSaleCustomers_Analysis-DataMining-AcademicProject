@@ -19,6 +19,7 @@ library(rpart)
 library(nnet)
 library(neuralnet)
 library(caret)
+library(DT)
 
 library(ggplot2)
 # charger le jeu de donnee + Preprocessing data
@@ -73,6 +74,7 @@ ui <- fluidPage(
     tags$div(class='btn-l',
             # tags$div(class="relative right-[20vw]",submitButton(text = 'update View',width = '200px',icon('th'))),
       tags$button('Sign In',id='modal',class='btn text-[arial]',style="color:#ab53dd; font-family:'arial';"),
+      
       tags$button('Log In',id='logmod',style="font-family:'arial';",class='text-[whitesmoke] bg-[#8c07da] h-[40px] w-[100px] mr-[50px] border-[1px] p-[10px] text-[15px] rounded-[4px] mt-[10px] text-[arial]',style="font-family:'arial';")
       
       ),bsModal(id = 'signIn' , trigger = "modal",size = "large" ,
@@ -89,7 +91,7 @@ ui <- fluidPage(
                     tags$h2(icon('user',class = 'mr-[5px]'),' Welcome Back : Log In', class="relative font-[arial] w-[full] text-[#8c07da] font-[bold] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
                     wellPanel(
                       textInput('email','Enter your Email',value = "dataMining@gmail.com"),textInput('pss','Enter Your PassWord',value = "2303"),
-                      submitButton(text = 'Send',width = '200px',icon('th'))
+                    #  submitButton(text = 'Send',width = '200px',icon('th'))
                     ),
                     class='w-[40vw] h-[50vh] border-[1px] relative left-[13%] top-[15px] border-[#8c07da] text-[#333] font-[bold] text-[20px] font-[arial] rounded-[10px]')
         )
@@ -151,7 +153,8 @@ tabsetPanel(
            tabsetPanel(tabPanel("Original Data",
                                 tags$div(class='w-full h-[30%]',
                                          tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Original Data'),
-                                         dataTableOutput("data")
+                                        dataTableOutput('data'),downloadButton('save','Download')
+                                         
                                 )),
                               
                        tabPanel("Clean Data",tags$div(class='w-full h-[30%]',
@@ -165,6 +168,12 @@ tabsetPanel(
                                                     tags$div(class="relative left-[20vw]",submitButton(text = 'update View',width = '150px',icon('th'))),
                                                     dataTableOutput("train")
                        )),
+                       tabPanel('Normalized Data',
+                                tags$div(class='w-full h-[30%]',
+                                         tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Normalize data'),
+                                         dataTableOutput('dat2')
+                                )),
+                       
                        tabPanel("TestSet",  tags$div(class='w-full h-[30%]',
                                                      tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'TestSet'),
                                                      dataTableOutput("test")
@@ -353,6 +362,30 @@ tabsetPanel(
     )
     ))
   ,
+  tabPanel('Unsupervized learning',
+           tabPanel('kmeans',
+                    sidebarLayout(
+                      
+                      sidebarPanel(
+                        numericInput('clust','Select the number of clusters',min=2,value=3,step=1 ),
+                        selectInput('X','Select the X variable',choices =c('Fresh','Milk') ),
+                        selectInput('Y','Select the Y variable',choices =c('Milk','Fresh') ) ,
+                        submitButton(text = 'update View',width = '200px',icon('th'))
+                    ),
+                      mainPanel(
+                        tabsetPanel(
+                          tabPanel('clusters visualization',plotOutput('plot1'))
+                        )
+                      )
+                      
+                    )
+           ),
+           
+           tabPanel('hierachic', )
+    
+    
+  ),
+  
   tabPanel("About",
            sidebarLayout(sidebarPanel('Why is this WholeSale Customers Data has been collected?' , class='relative top-[5vh] text-[#333]',wellPanel(class="p-[10px] relative top-[30px]",
                                                                                                                               # tags$div(class="w-[400px] h-[500px] border-[1px] mr-[10vw] p-[10px] rounded-[10px]",
@@ -403,6 +436,60 @@ p("MILK: annual spending (m.u.) on milk products (Continuous)"),
   ))
 
 server <- function(input, output,session) {
+  
+  
+  ##kmeans
+  # data$=NULL
+  #----------------------------------------
+  df=data[,-c(1,2)]
+  #output$dataclean=renderDT({df})
+  
+  ##sauvegarde du jeu 
+  output$save=downloadHandler(filename = function(){
+    paste('clean_',Sys.Date(),'.csv',sep = '') #Sys.Date() met la date du jour
+  },
+  content=function(file){
+    write.csv(df,file)#enregistre sous forme de csv
+  }
+  )
+  
+  
+  ##normalisation
+  data_norm =  read.csv('./data/Wholesale customers data (1).csv')
+  data_norm$Channel=NULL
+  data_norm$Region=NULL
+  data_norm$Fresh=(data_norm$Fresh-min(data_norm$Fresh))/(max(data_norm$Fresh)-min(data_norm$Fresh))
+  data_norm$Milk=(data_norm$Milk-min(data_norm$Milk))/(max(data_norm$Milk)-min(data_norm$Milk))
+  data_norm$Grocery=(data_norm$Grocery-min(data_norm$Grocery))/(max(data_norm$Grocery)-min(data_norm$Grocery))
+  data_norm$Frozen=(data_norm$Frozen-min(data_norm$Frozen))/(max(data_norm$Frozen)-min(data_norm$Frozen))
+  data_norm$Detergents_Paper=(data_norm$Detergents_Paper-min(data_norm$Detergents_Paper))/(max(data_norm$Detergents_Paper)-min(data$Detergents_Paper))
+  data_norm$Delicassen=(data_norm$Delicassen-min(data_norm$Delicassen))/(max(data_norm$Delicassen)-min(data_norm$Delicassen))
+  output$dat2=renderDataTable({data_norm})
+  
+  ##clusters
+  # Combine the selected variables into a new data frame
+  selectedData <- reactive({
+    data_norm[, c(input$X, input$Y)]
+  })
+  
+  clusters <- reactive({
+    kmeans(selectedData(), input$clust)
+  })
+  
+  output$plot1 <- renderPlot({
+   # input$clu
+   # isolate({
+      palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
+                "#FF7F00", "#FFFF33", "#A65628", "#F781BF", "#999999"))
+      
+      
+      # par(mar = c(5.1, 4.1, 0, 1))
+      plot(selectedData(),
+           col = clusters()$cluster,
+           pch = 20, cex = 3)
+      points(clusters()$centers, pch = 4, cex = 4, lwd = 4)})
+ # })
+  #---------------------------------
 
   output$TEST=renderText(input$milk)
   
@@ -562,6 +649,14 @@ server <- function(input, output,session) {
     
   })
   # ---------------
+  
+  
+  #---------------------Lyse-------------------------------------------
+  
+  
+  
+  
+  #----
 
   #+++++++++++++++++Handling Missing Data Vizualising BoxPlot++++++++++++++++++++++++++++++++++# 
   
@@ -737,6 +832,58 @@ output$data= renderDataTable({data},options =list(pageLength=5))
       pred = data.frame(Fresh,Milk,Grocery,Frozen,Detergents_Paper,Delicassen) 
       return(pred)
     })
+    
+    ##kmeans
+   # data$=NULL
+    #----------------------------------------
+    df=data[,-c(1,2)]
+    output$dataclean=renderDT({df})
+    
+    ##sauvegarde du jeu 
+    output$save=downloadHandler(filename = function(){
+      paste('clean_',Sys.Date(),'.csv',sep = '') #Sys.Date() met la date du jour
+    },
+    content=function(file){
+      write.csv(df,file)#enregistre sous forme de csv
+    }
+    )
+    
+    
+    ##normalisation
+    data_norm =  read.csv('./data/Wholesale customers data (1).csv')
+    data_norm$Channel=NULL
+    data_norm$Region=NULL
+    data_norm$Fresh=(data_norm$Fresh-min(data_norm$Fresh))/(max(data_norm$Fresh)-min(data_norm$Fresh))
+    data_norm$Milk=(data_norm$Milk-min(data_norm$Milk))/(max(data_norm$Milk)-min(data_norm$Milk))
+    data_norm$Grocery=(data_norm$Grocery-min(data_norm$Grocery))/(max(data_norm$Grocery)-min(data_norm$Grocery))
+    data_norm$Frozen=(data_norm$Frozen-min(data_norm$Frozen))/(max(data_norm$Frozen)-min(data_norm$Frozen))
+    data_norm$Detergents_Paper=(data_norm$Detergents_Paper-min(data_norm$Detergents_Paper))/(max(data_norm$Detergents_Paper)-min(data$Detergents_Paper))
+    data_norm$Delicassen=(data_norm$Delicassen-min(data_norm$Delicassen))/(max(data_norm$Delicassen)-min(data_norm$Delicassen))
+    output$dat2=renderDataTable({data_norm})
+    
+    ##clusters
+    # Combine the selected variables into a new data frame
+    selectedData <- reactive({
+      data_norm[, c(input$X, input$Y)]
+    })
+    
+    clusters <- reactive({
+      kmeans(selectedData(), input$clust)
+    })
+    
+    output$plot1 <- renderPlot({input$clu
+      isolate({
+        palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
+                  "#FF7F00", "#FFFF33", "#A65628", "#F781BF", "#999999"))
+        
+        
+        # par(mar = c(5.1, 4.1, 0, 1))
+        plot(selectedData(),
+             col = clusters()$cluster,
+             pch = 20, cex = 3)
+        points(clusters()$centers, pch = 4, cex = 4, lwd = 4)})
+    })
+    #---------------------------------
     
 
 
