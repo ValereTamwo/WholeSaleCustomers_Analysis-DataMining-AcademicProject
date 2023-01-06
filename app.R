@@ -19,6 +19,7 @@ library(rpart)
 library(nnet)
 library(neuralnet)
 library(caret)
+library(e1071)
 library(DT)
 
 library(ggplot2)
@@ -509,6 +510,7 @@ server <- function(input, output,session) {
   output$restable = renderTable({
     
     clean = cleaning(data=data)
+    clean[['Region']]=factor(clean[['Region']])
     pred = predValues()
     nt=sample(1:nrow(clean),0.7*nrow(clean))
     trains=clean[nt,-1]
@@ -522,16 +524,22 @@ server <- function(input, output,session) {
     }else if(input$model=="KNN"){
       
       classe = clean[nt,2]
-      predict_=knn(train = trains,test = pred,cl = classe,k=10,prob=TRUE)
+      predict_=knn(train = trains[,-1],test = pred,cl = classe,k=5)
       
     }else if(input$model=="Neural Network"){
       nn = neuralnet(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data=trains,hidden=3,act.fct = "logistic",
                      linear.output = FALSE)
       #model = nnet(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,trains,size=3)
-      predict= predict(model,pred)
+      predict= predict(nn,pred)
       
     }else if(input$model=="SVM"){
-      
+  #    trctrl=trainControl(method = "repeatedcv",number = 10,repeats = 3)
+  #    svmLinear = train(Region~.,data = trains,method ="svmLinear",trControl=trctrl,
+   #                     preProcess = c("center", "scale"),
+    #                    tuneLength = 10)
+     # pred_S = predict(svmLinear,newdata = pred)
+      svm_= svm(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data = trains)
+      pred_S = predict(svm_,newdata =pred)
     }
     
    # predict
@@ -539,6 +547,7 @@ server <- function(input, output,session) {
   
   output$matC = renderPrint({
     clean = cleaning(data=data)
+    clean[['Region']]=factor(clean[['Region']])
     nt=sample(1:nrow(clean),0.7*nrow(clean))
     trains=clean[nt,-1]
     tests = clean[-nt,-1]  
@@ -559,15 +568,23 @@ server <- function(input, output,session) {
       
       nn = neuralnet(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data=trains,hidden=3,act.fct = "logistic",
                      linear.output = FALSE)
-      predictNN = compute(nn,tests[,-1])
-      prob = predictNN$net.result
-      pred <- ifelse(prob>0.5, 0,1)
+     # predictNN = compute(nn,tests[,-1])
+     # prob = predictNN$net.result
+      #pred <- ifelse(prob>0.5, 0,1)
+      predd = predict(nn,tests[,-1] )
+      table(tests[,1],apply(predd, 1, which.max))
       #predict_N= predict(model,tests[,-1])
       
-      matcc = table(pred,tests[,1])
+      matcc = table(predd,tests[,1])
       
     }else if(input$model=="SVM"){
-      
+      #trctrl=trainControl(method = "repeatedcv",number = 10,repeats = 3)
+        #svmLinear = train(Region~.,data = trains,method ="svmLinear",trControl=trctrl,
+        #                preProcess = c("center", "scale"),
+         #               tuneLength = 10)
+      svm_= svm(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data = trains)
+      pred_S = predict(svm_,newdata = tests[,-1])
+      confusionMatrix(table(pred_S,tests[,1]))
     }
     # predict
   })
@@ -575,7 +592,7 @@ server <- function(input, output,session) {
   # Afficher les models
   output$plotM = renderPlot({
     clean = cleaning(data = data)
-
+    clean[['Region']]=factor(clean[['Region']])
     nt=sample(1:nrow(clean),0.7*nrow(clean))
     trains=clean[nt,-1]
     tests = clean[-nt,-1]  
@@ -596,8 +613,9 @@ server <- function(input, output,session) {
                      linear.output = FALSE)
       plot(nn)
     }else if(input$model=="SVM"){
-      
-    }
+      svm_= svm(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data = trains)
+      plot(svm_,data=trains,Fresh~Milk,slice = list())
+      }
     # predict
   })
   # calcul Precision 
