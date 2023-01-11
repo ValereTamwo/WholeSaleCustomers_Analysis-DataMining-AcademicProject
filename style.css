@@ -65,3 +65,9 @@ header{
 aside{
     color:#8c07da
 }
+
+.avocat{
+  width: 30px;
+  height: 60px;
+  color:red;
+}

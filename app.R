@@ -166,7 +166,7 @@ tabsetPanel(
                               
                        tabPanel("Clean Data",tags$div(class='w-full h-[30%]',
                                                       tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Clean Data'),
-                                                      dataTableOutput("clean")
+                                                      dataTableOutput("clean"),downloadButton('save1','Download')
                        )),
                        tabPanel("TrainSet",tags$div(class='w-full h-[30%]',
                                                     tags$h2( class="relative w-[80vw] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'TrainSet'),
@@ -178,7 +178,7 @@ tabsetPanel(
                        tabPanel('Normalized Data',
                                 tags$div(class='w-full h-[30%]',
                                          tags$h2( class="relative w-[full] h-[70px] p-[4px] flex items-right left-[5vw] font-[arial] mt-[30px] pt-[5px] border-y-[1px] text-[#8c07da] font-[bold] text-[20px]", 'Normalize data'),
-                                         dataTableOutput('dat2')
+                                         dataTableOutput('dat2'),downloadButton('save2','Download')
                                 )),
                        
                        tabPanel("TestSet",  tags$div(class='w-full h-[30%]',
@@ -370,6 +370,7 @@ tabsetPanel(
     ))
   ,
   tabPanel('Unsupervized learning',
+           tabsetPanel(
            tabPanel('kmeans',
                     sidebarLayout(
                       
@@ -388,9 +389,39 @@ tabsetPanel(
                     )
            ),
            
-           tabPanel('hierachic', ),
-           tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model'),
-                                                                                                                      
+
+           tabPanel('hierachic',
+                    #on identifie d'abord si nos donnees sont numeriques si non on les discretise avec as.numeric()
+                    #ensuite on centre et on reduit nos donnees avec la normalisation z-score ou avec scale puis on tramnsforme en matrice
+                    #on centre et on reduit pourenlever le probleme des differentes unites p e
+                    #on calcul la matrice de distance entre les individus avec ?dist
+                    #classification ascendante hierachique 'ward'ou 'ward.D' ou 'ward.D2'
+                    #affichage du dendogramme avec materialisation des classes, border=1 a 5 pour le calcul des cardes
+                    #decoupage en k groupes
+                    tabsetPanel(
+                      tabPanel('Numerisation',dataTableOutput('numdata')),
+                      tabPanel('Centralisation et Reduction',dataTableOutput('hier1')),
+                      tabPanel('matrice de distance',verbatimTextOutput('hier2')),
+                     # tabPanel('CAH',dataTableOutput('hier3')),
+                      tabPanel('Dendogramme',
+                               sidebarLayout(
+                                 sidebarPanel( numericInput('den','Select the number of clusters',min=2,value=10,step=1 ),
+                                              submitButton(text='Afficher',icon = NULL,width=NULL)
+                                              
+                                               
+                                 ),
+                                 mainPanel(plotOutput('hier4')#,
+                                         #  plotOutput('hier5')
+                                 )
+                               )
+                      )
+                      
+                      
+                      
+                    )
+                    
+                    
+                    
            )
            )
     
@@ -478,6 +509,53 @@ p("MILK: annual spending (m.u.) on milk products (Continuous)"),
 
 server <- function(input, output,session) {
   
+  #--------classifiaction ascendante hierachique----------#
+  
+  
+  #numerisation des donnees et suppression de l'attribut region car nominale
+  data = read.csv('./data/Wholesale customers data (1).csv')
+  hierac=data
+  hierac[,3:8]=as.numeric(c(hierac$Fresh,hierac$Milk,hierac$Grocery,hierac$Frozen,hierac$Detergents_Paper,hierac$Delicassen))
+  output$numdata=renderDataTable({hierac})
+  
+  #centrer et reduire les donnees
+  data = read.csv('./data/Wholesale customers data (1).csv')
+  hierac=data
+  hier=hierac
+  # hier$Region=NULL
+  #hier$Channel=NULL
+  hier$Fresh=((hier$Fresh-mean(hier$Fresh))/sd(hier$Fresh))
+  hier$Milk=((hier$Milk-mean(hier$Milk))/sd(hier$Milk))
+  hier$Grocery=((hier$Grocery-mean(hier$Grocery))/sd(hier$Grocery))
+  hier$Frozen=((hier$Frozen-mean(hier$Frozen))/sd(hier$Frozen))
+  hier$Detergents_Paper=((hier$Detergents_Paper-mean(hier$Detergents_Paper))/sd(hier$Detergents_Paper))
+  hier$Delicassen=((hier$Delicassen-mean(hier$Delicassen))/sd(hier$Delicassen))
+  cendata=as.matrix(hier) 
+  #ou avec scale
+  # hier1=scale(as.matrix(hier[,c(-1,-2)],center=TRUE,scale=TRUE))
+  # rownames(hier1)=hier[,c(1,2)] puis on rajoute les colonnes numeriques
+  output$hier1=renderDataTable({cendata})
+  
+  #calcul des distances(euclidean,maximum,manhattan,canberra,binary,minkowski) pour la matrice de distance entre les individu
+  cendata=as.matrix(hier) 
+  distdata=dist(cendata,method='euclidean')
+  output$hier2=renderPrint({distdata})
+  
+  #classification ascendante hierarchique 'single','complete','average','ward','ward.D','ward.D2'
+  cahdata=hclust(distdata,method = 'ward')
+     #output$hier3=renderDataTable({cahdata})
+  
+  #affichage du dendogramme avec materialisation des classes border=1 a 5 pour la couleur du cardre
+  #cahdata1=rect.hclust(cahdata,k=input$den,border=2)
+  output$hier4=renderPlot({plot(cahdata)})
+  
+  #decoupage en k groupes ou classes
+  kcahdata=cutree(cahdata,k=3)
+  kcahdata1=table(kcahdata)
+  output$hier5=renderDataTable({kcahdata1})
+  
+  #ajout au fichier d'origine lq nouvelle vqriqble kcahdata
+  # totcahdata=cbind(hierac,kcahdata)
   
   ##kmeans
   # data$=NULL
@@ -487,7 +565,22 @@ server <- function(input, output,session) {
   
   ##sauvegarde du jeu 
   output$save=downloadHandler(filename = function(){
-    paste('clean_',Sys.Date(),'.csv',sep = '') #Sys.Date() met la date du jour
+    paste('data_',Sys.Date(),'.csv',sep = '') #Sys.Date() met la date du jour
+  },
+  content=function(file){
+    write.csv(df,file)#enregistre sous forme de csv
+  }
+  )
+  
+  output$save1=downloadHandler(filename = function(){
+    paste('Clean_data_',Sys.Date(),'.csv',sep = '') #Sys.Date() met la date du jour
+  },
+  content=function(file){
+    write.csv(df,file)#enregistre sous forme de csv
+  }
+  )
+  output$save2=downloadHandler(filename = function(){
+    paste('Normalized_data_',Sys.Date(),'.csv',sep = '') #Sys.Date() met la date du jour
   },
   content=function(file){
     write.csv(df,file)#enregistre sous forme de csv
@@ -985,6 +1078,8 @@ output$data= renderDataTable({data},options =list(pageLength=5))
 
  
    #prediction(input$model,input$milk,input$fresh,input$grocery,input$frozen,input$detergent,input$delis)
+    
+
     
 }
 
