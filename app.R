@@ -108,7 +108,7 @@ tabsetPanel(
     tabPanel("Home",
              sidebarLayout(
                        sidebarPanel(tags$h3('Predictive Value Form', 
-                                            class="relative w-[full] h-[40px] bottom-[20px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]")
+                                            class="relative w-[full] text-[17px] text-[#8c07da] h-[40px] bottom-[20px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]")
                                     ,wellPanel(selectInput('model','Choose a predictive Model',choices = c("Decision Tree","Neural Network","KNN","SVM")),
                                               numericInput('fresh','Fresh Depense',value = 2303),
                                               numericInput('milk','Milk Depense',value = 2303),
@@ -122,17 +122,17 @@ tabsetPanel(
       ,mainPanel(class='relative right-[4vw]',actionButton("toggleSidebarPanel", "", icon = icon("bars")),
                  tags$div(class='flex gap-[30px] relative left-[70px] bottom-[40px]' ,
                    tags$div(class='flex flex-col ',
-                     tags$h3('Model Plot', class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),class='w-[35vw]   h-[83vh] border-[1px] rounded-[10px] pr-[10px] pb-[10px] pl-[10px]',
+                     tags$h3('Model Plot', class="text-[#8c07da] relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),class='w-[35vw]   h-[83vh] border-[1px] rounded-[10px] pr-[10px] pb-[10px] pl-[10px]',
                      tags$div(class='w-[90%] h-[50%] border-[1px] rounded-[10px] border-[] relative top-[5%] left-[1.5vw] ',
                            plotOutput('plotM',width = '445px',height = '300px')
                      ),                     
                      tags$div(class='w-[90%] h-[30%] border-[1px] rounded-[10px] border-[#8c07da] relative top-[10%] left-[1.5vw] ',
-                              tags$h3('Predictive Result', class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                              tags$h3('Predictive Result', class="relative text-[17px] text-[#8c07da] w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
                              tags$div(class="flex justify-center items-center",tableOutput("restable"))
                               )
                      ),
                   tags$div(
-                    tags$h3( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]", 'Accuracy Calcul'),class='w-[30vw] h-[88vh] p-[10px] border-[1px] rounded-[10px]',
+                    tags$h3( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px] text-[#8c07da]", 'Accuracy Calcul'),class='w-[30vw] h-[88vh] p-[10px] border-[1px] rounded-[10px]',
                     tags$div(class = " w-[27vw] h-[50%] ",
                              #tags$p(class="relative text-[#8c07da] right-[80px] mb-[10px] mt-[10px]",'Confusion Matrice'),
                    # tableOutput('matC')
@@ -415,10 +415,10 @@ tabsetPanel(
                         ),
                         tags$div(
                           tags$h3( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]", 'Visualising Rules'),class='w-[30vw] h-[60vh] p-[10px] border-[1px] rounded-[10px]',
-                          tags$div(class = " w-[27vw] h-[50%] ",
+                          tags$div(class = " w-[27vw] h-[50%] justify-center items-center flex ",tags$p(class=" text-[20px] text-[#8c07da] mt-[40%] ", "The package needed for rules Visualisation can not be install (arulesViz) ")
                                    #tags$p(class="relative text-[#8c07da] right-[80px] mb-[10px] mt-[10px]",'Confusion Matrice'),
                                    # tableOutput('matC')
-                                  plotOutput("plotrule")
+                               #   plotOutput("plotrule")
                           ),)
     )
     )),
@@ -876,7 +876,7 @@ output$data= renderDataTable({data},options =list(pageLength=5))
 
       output$sum = renderDataTable({
        summary(data)
-     })
+     },options = list(pageLength=5))
      output$sum2=renderDataTable(df,options = list(pageLength=5))
      
      #-----------------------------Visualizing data ----------------------
