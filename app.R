@@ -21,8 +21,10 @@ library(neuralnet)
 library(caret)
 library(e1071)
 library(DT)
-
+library(arules)
 library(ggplot2)
+#library(arulesViz)
+
 # charger le jeu de donnee + Preprocessing data
 data = read.csv('./data/Wholesale customers data (1).csv')
 cleaning = function(data){
@@ -70,6 +72,10 @@ cleaning = function(data){
 options(shiny.launch.browser = .rs.invokeShinyWindowExternal)
 ui <- fluidPage(  
   use_tailwind(),
+  tags$style(type = "text/tailwindcss","
+  .irs-single {@apply bg-pink-500 !important;}
+  .irs-bar {@apply bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 border-none !important;}
+  "),
   includeCSS('./style.css'),tags$header(
     tags$h2("WholeSale Customers Prediction",class='text-[20px] text-[arial] font-[bold] ml-[20px] mb-[7px] mt-[10px]',style="font-family:'arial';"),
     tags$div(class='btn-l',
@@ -102,7 +108,7 @@ tabsetPanel(
     tabPanel("Home",
              sidebarLayout(
                        sidebarPanel(tags$h3('Predictive Value Form', 
-                                            class="relative w-[full] h-[40px] bottom-[20px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]")
+                                            class="relative w-[full] text-[17px] text-[#8c07da] h-[40px] bottom-[20px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]")
                                     ,wellPanel(selectInput('model','Choose a predictive Model',choices = c("Decision Tree","Neural Network","KNN","SVM")),
                                               numericInput('fresh','Fresh Depense',value = 2303),
                                               numericInput('milk','Milk Depense',value = 2303),
@@ -116,17 +122,17 @@ tabsetPanel(
       ,mainPanel(class='relative right-[4vw]',actionButton("toggleSidebarPanel", "", icon = icon("bars")),
                  tags$div(class='flex gap-[30px] relative left-[70px] bottom-[40px]' ,
                    tags$div(class='flex flex-col ',
-                     tags$h3('Model Plot', class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),class='w-[35vw]   h-[83vh] border-[1px] rounded-[10px] pr-[10px] pb-[10px] pl-[10px]',
+                     tags$h3('Model Plot', class="text-[#8c07da] relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),class='w-[35vw]   h-[83vh] border-[1px] rounded-[10px] pr-[10px] pb-[10px] pl-[10px]',
                      tags$div(class='w-[90%] h-[50%] border-[1px] rounded-[10px] border-[] relative top-[5%] left-[1.5vw] ',
                            plotOutput('plotM',width = '445px',height = '300px')
                      ),                     
                      tags$div(class='w-[90%] h-[30%] border-[1px] rounded-[10px] border-[#8c07da] relative top-[10%] left-[1.5vw] ',
-                              tags$h3('Predictive Result', class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
+                              tags$h3('Predictive Result', class="relative text-[17px] text-[#8c07da] w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
                              tags$div(class="flex justify-center items-center",tableOutput("restable"))
                               )
                      ),
                   tags$div(
-                    tags$h3( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]", 'Accuracy Calcul'),class='w-[30vw] h-[88vh] p-[10px] border-[1px] rounded-[10px]',
+                    tags$h3( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px] text-[#8c07da]", 'Accuracy Calcul'),class='w-[30vw] h-[88vh] p-[10px] border-[1px] rounded-[10px]',
                     tags$div(class = " w-[27vw] h-[50%] ",
                              #tags$p(class="relative text-[#8c07da] right-[80px] mb-[10px] mt-[10px]",'Confusion Matrice'),
                    # tableOutput('matC')
@@ -383,6 +389,7 @@ tabsetPanel(
                     )
            ),
            
+
            tabPanel('hierachic',
                     #on identifie d'abord si nos donnees sont numeriques si non on les discretise avec as.numeric()
                     #ensuite on centre et on reduit nos donnees avec la normalisation z-score ou avec scale puis on tramnsforme en matrice
@@ -421,7 +428,37 @@ tabsetPanel(
     
   ),
   
-  tabPanel("About",
+  tabPanel("Rules Extraction", sidebarLayout(
+    sidebarPanel(tags$h3('Extract rules concluding with class Region', 
+                         class="relative w-[full] h-[40px] bottom-[20px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]")
+                 ,wellPanel(twSliderInput("sup","Choose support (%)",label_class = "font-bold", input_class = "rounded-md border border-2 border-stone-200",min = 20,value = 60,max = 100),
+                            twSliderInput("conf","choose Conf (%)",min = 20,value = 80,max = 100),
+                            tags$div(class="relative right-[]",submitButton(text = 'update View',width = '200px',icon('th'))),                                                       ),
+                 class="w-[30vw] h-[60vh] mt-[12px]")
+    
+    ,mainPanel(class='relative right-[4vw]',actionButton("toggleSidebarPanel", "", icon = icon("bars")),
+               tags$div(class='flex gap-[30px] relative left-[70px] bottom-[40px]' ,
+                        tags$div(class='flex flex-col ',
+                                 tags$h3('Rules', class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),class='w-[35vw]   h-[77vh] border-[1px] rounded-[10px] pr-[10px] pb-[10px] pl-[10px]',
+                                 tags$div(class='w-[90%] h-[50%] border-[1px] rounded-[10px] border-[] relative top-[5%] left-[1.5vw] p-[10px] overflow-scroll ',
+                                          dataTableOutput('rule_f')
+                                 )
+                        ),
+                        tags$div(
+                          tags$h3( class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]", 'Visualising Rules'),class='w-[30vw] h-[60vh] p-[10px] border-[1px] rounded-[10px]',
+                          tags$div(class = " w-[27vw] h-[50%] justify-center items-center flex ",tags$p(class=" text-[20px] text-[#8c07da] mt-[40%] ", "The package needed for rules Visualisation can not be install (arulesViz) ")
+                                   #tags$p(class="relative text-[#8c07da] right-[80px] mb-[10px] mt-[10px]",'Confusion Matrice'),
+                                   # tableOutput('matC')
+                               #   plotOutput("plotrule")
+                          ),)
+    )
+    )),
+    tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative  text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model'),
+                                                                                                               
+    )
+    )
+    ),
+  tabPanel("About", 
            sidebarLayout(sidebarPanel('Why is this WholeSale Customers Data has been collected?' , class='relative top-[5vh] text-[#333]',wellPanel(class="p-[10px] relative top-[30px]",
                                                                                                                               # tags$div(class="w-[400px] h-[500px] border-[1px] mr-[10vw] p-[10px] rounded-[10px]",
                                                                                                                                         tags$h3('Our Goal', icon("arrow-right"),
@@ -589,6 +626,44 @@ server <- function(input, output,session) {
   #---------------------------------
 
   output$TEST=renderText(input$milk)
+  
+  
+  # Extraction des regles 
+  
+  discretise = function(data){
+    data = data
+    data$Region=cut(data$Region,breaks=3,labels=c("un","deux","trois"))
+    data$Fresh=cut(data$Fresh,breaks=3,labels=c("un","deux","trois"))
+    data$Milk=cut(data$Milk,breaks=3,labels=c("un","deux","trois"))
+    data$Grocery=cut(data$Grocery,breaks=3,labels=c("un","deux","trois"))
+    data$Frozen=cut(data$Frozen,breaks=3,labels=c("un","deux","trois"))
+    data$Detergents_Paper=cut(data$Detergents_Paper,breaks=3,labels=c("un","deux","trois"))
+    data$Delicassen=cut(data$Delicassen,breaks=3,labels=c("un","deux","trois"))
+    
+    trans = as(data[,-1],"transactions")
+    return(trans)
+  }
+  appriori = reactive({
+    trans = discretise(data = data)
+    rules = apriori(trans,parameter=list(supp=as.numeric(input$sup)*0.01,conf = as.numeric(input$conf)*0.01,target="rules"))
+   # rules = apriori(trans,parameter=list(supp=0.6,conf = 0.7,target="rules"))
+    ruleselect <- subset(rules, subset = rhs %pin% "Region=")
+    subrules2 <- head(sort(ruleselect, by="lift"), 5)
+  })
+  
+  output$plotrule = renderPlot({
+    regle = appriori()
+    plot(regle)
+  })
+  
+  output$rule_f = renderDataTable({
+    regle = appriori()
+    rdf  = data.frame(
+      lhs = labels(lhs(regle)),	
+      rhs = labels(rhs(regle))
+      )
+    })
+  
   
   # Remplacement des Niveau de l'attribut Region par les valeurs categorielles
   
@@ -894,7 +969,7 @@ output$data= renderDataTable({data},options =list(pageLength=5))
 
       output$sum = renderDataTable({
        summary(data)
-     })
+     },options = list(pageLength=5))
      output$sum2=renderDataTable(df,options = list(pageLength=5))
      
      #-----------------------------Visualizing data ----------------------
