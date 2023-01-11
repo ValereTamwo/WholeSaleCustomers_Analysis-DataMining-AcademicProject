@@ -30,6 +30,8 @@ cleaning = function(data){
   clean$Fresh[clean$Fresh>35000&clean$Region==1]=mean(clean$Fresh[clean$Region==1&clean$Fresh<35000])
   
   #MilK Outlier
+
+  #yjttuyihuiho
   
   clean$Milk[clean$Milk>15000&clean$Region==3]=mean(clean$Milk[clean$Region==3&clean$Milk<15000])
   clean$Milk[clean$Milk>15000&clean$Region==2]=mean(clean$Milk[clean$Region==2&clean$Milk<15000])
