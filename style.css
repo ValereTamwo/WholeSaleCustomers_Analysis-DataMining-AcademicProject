@@ -62,6 +62,90 @@ header{
     gap: 20px;
 }
 
+.div{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.div1{
+  
+   width: 600px;
+    height: 450px;
+    overflow:scroll;
+    padding:20px;
+  border: 5px;
+}
+
+.div2{
+  width: 300px;
+    height: 300px;
+ border: 5px;
+ display: flex;
+ justify-content:center;
+ align-items: center;
+ padding-top: 5%;
+ overflow:scroll;
+ 
+}
+
+.div3{
+   width: 800px;
+    height: 300px;
+    padding:20px;
+    border: 5px;
+}
+
+.div4{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.div5{
+  width: 800px;
+    height: 400px;
+ border: 5px;
+ display: flex;
+ justify-content:center;
+ align-items: center;
+ padding-top: 5%;
+ overflow:scroll;
+ margin-left: 20px;
+ margin-top: 20px;
+ 
+}
+
+.div6{
+   width: 800px;
+    height: 300px;
+    padding:20px;
+    border: 5px;
+    margin-top: 100px;
+}
+.div7{
+  color: #8c07da ;
+}
+
+.div8{
+  display: flex;
+    flex-direction: row;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.div9{
+  width: 800px;
+    height: 300px;
+}
+.div10{
+  
+}
+.div11{
+  margin-top: 150px;
+}
+
+
 aside{
     color:#8d07da
 }
