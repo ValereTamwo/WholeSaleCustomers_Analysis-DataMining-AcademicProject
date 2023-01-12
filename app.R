@@ -365,56 +365,75 @@ tabsetPanel(
   ,
   tabPanel('Unsupervized learning',
            tabsetPanel(
-           tabPanel('kmeans',
-                    sidebarLayout(
+             tabPanel('kmeans',
                       
-                      sidebarPanel(
-                        numericInput('clust','Select the number of clusters',min=2,value=3,step=1 ),
-                        selectInput('X','Select the X variable',choices =c('Fresh','Milk') ),
-                        selectInput('Y','Select the Y variable',choices =c('Milk','Fresh') ) ,
-                        submitButton(text = 'update View',width = '200px',icon('th'))
-                    ),
-                      mainPanel(
-                        tabsetPanel(
-                          tabPanel('clusters visualization',plotOutput('plot1'))
+                      sidebarLayout(
+                        
+                        sidebarPanel(
+                          numericInput('clust','Select the number of clusters',min=2,value=2,step=1),
+                          # h3('visualization'),
+                          #numericInput('clust1','Select the number of clusters for the visualization',min=2,value=2,step=1),
+                          selectInput('X','Select the X variable',choices = c("Fresh","Milk","Grocery","Frozen","Detergents_Paper","Delicassen") ),
+                          selectInput('Y','Select the Y variable',choices = c("Fresh","Milk","Grocery","Frozen","Detergents_Paper","Delicassen") ),
+                          submitButton(text = 'Apply',width = '200px',icon('th'))
+                          
+                        ),
+                        mainPanel(
+                          
+                          tags$div(class='div',
+                                   tags$div(class=' div1 ',verbatimTextOutput('print')),
+                                   tags$div(class='div3',h3('clusters visualization'),plotOutput('plot1')),
+                                   tags$div(class='div2',tableOutput('kmean'))
+                                   
+                          )
+                          
                         )
+                        
                       )
                       
-                    )
-           ),
+                      
+             ),
            
-           tabPanel('hierachic',
-                    #on identifie d'abord si nos donnees sont numeriques si non on les discretise avec as.numeric()
-                    #ensuite on centre et on reduit nos donnees avec la normalisation z-score ou avec scale puis on tramnsforme en matrice
-                    #on centre et on reduit pourenlever le probleme des differentes unites p e
-                    #on calcul la matrice de distance entre les individus avec ?dist
-                    #classification ascendante hierachique 'ward'ou 'ward.D' ou 'ward.D2'
-                    #affichage du dendogramme avec materialisation des classes, border=1 a 5 pour le calcul des cardes
-                    #decoupage en k groupes
-                    tabsetPanel(
-                      tabPanel('Numerisation',dataTableOutput('numdata')),
-                      tabPanel('Centralisation et Reduction',dataTableOutput('hier1')),
-                      tabPanel('matrice de distance',verbatimTextOutput('hier2')),
-                     # tabPanel('CAH',dataTableOutput('hier3')),
-                      tabPanel('Dendogramme',
-                               sidebarLayout(
-                                 sidebarPanel( numericInput('den','Select the number of clusters',min=2,value=10,step=1 ),
-                                              submitButton(text='Afficher',icon = NULL,width=NULL)
-                                              
-                                               
+             tabPanel('hierachic',
+                      
+                      #on identifie d'abord si nos donnees sont numeriques si non on les discretise avec as.numeric()
+                      #ensuite on centre et on reduit nos donnees avec la normalisation z-score ou avec scale puis on tramnsforme en matrice
+                      #on centre et on reduit pourenlever le probleme des differentes unites p e
+                      #on calcul la matrice de distance entre les individus avec ?dist
+                      #classification ascendante hierachique 'ward'ou 'ward.D' ou 'ward.D2'
+                      #affichage du dendogramme avec materialisation des classes, border=1 a 5 pour le calcul des cardes
+                      #decoupage en k groupes
+                      tabsetPanel(
+                       # tabPanel('numerisation des donnees',dataTableOutput('numdata')),
+                        tabPanel('centralisation et numerisation des donnees',dataTableOutput('hier1')),
+                        tabPanel('matrice de distance',
+                                 tags$div(class='div4',
+                                 tags$div(class='div5',verbatimTextOutput('hier2')),
+                               tags$div(class='div6',tags$h3(class='div7','Description'),verbatimTextOutput('hier3')))
                                  ),
-                                 mainPanel(plotOutput('hier4')#,
-                                         #  plotOutput('hier5')
+                        
+                        tabPanel('Dendogramme',
+                                 sidebarLayout(
+                                   sidebarPanel( numericInput('den','Select the number of clusters',min=2,value=2,step=1 ),
+                                                 submitButton(text = 'View',width = '200px',icon('th'))
+                                                 
+                                   ),
+                                   mainPanel(
+                                     tags$div(class='div8',
+                                     tags$div(class='div9',plotOutput('hier4')),
+                                            tags$div(class='div10',tableOutput('hier5'))
+                                     ),
+                                             tags$div(class='div11',tableOutput('hier6'))
+                                   )
                                  )
-                               )
-                      )
-                      
-                      
-                      
-                    )
-                    
-                    
-                    
+                                 
+                                 
+                        )
+                      )       
+             )
+             
+           ),
+           tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
            )
            )
     
@@ -472,32 +491,43 @@ p("MILK: annual spending (m.u.) on milk products (Continuous)"),
 
 server <- function(input, output,session) {
   
-  #--------classifiaction ascendante hierachique----------#
   
   
-  #numerisation des donnees et suppression de l'attribut region car nominale
-  data = read.csv('./data/Wholesale customers data (1).csv')
-  hierac=data
-  hierac[,3:8]=as.numeric(c(hierac$Fresh,hierac$Milk,hierac$Grocery,hierac$Frozen,hierac$Detergents_Paper,hierac$Delicassen))
-  output$numdata=renderDataTable({hierac})
+  
+  #classifiaction ascendante hierachique
+  
+  
+  ##numerisation des donnees et suppression de l'attribut region car nominale
+  #data = read.csv('./data/Wholesale customers data (1).csv')
+  #hierac=data
+ # hierac[,3:8]=as.numeric(c(hierac$Fresh,hierac$Milk,hierac$Grocery,hierac$Frozen,hierac$Detergents_Paper,hierac$Delicassen))
+ # output$numdata=renderDataTable({hierac})
   
   #centrer et reduire les donnees
   data = read.csv('./data/Wholesale customers data (1).csv')
   hierac=data
   hier=hierac
-  # hier$Region=NULL
-  #hier$Channel=NULL
+   #hier$Region=NULL
+  hier$Channel=NULL
   hier$Fresh=((hier$Fresh-mean(hier$Fresh))/sd(hier$Fresh))
   hier$Milk=((hier$Milk-mean(hier$Milk))/sd(hier$Milk))
   hier$Grocery=((hier$Grocery-mean(hier$Grocery))/sd(hier$Grocery))
   hier$Frozen=((hier$Frozen-mean(hier$Frozen))/sd(hier$Frozen))
   hier$Detergents_Paper=((hier$Detergents_Paper-mean(hier$Detergents_Paper))/sd(hier$Detergents_Paper))
   hier$Delicassen=((hier$Delicassen-mean(hier$Delicassen))/sd(hier$Delicassen))
-  cendata=as.matrix(hier) 
+
+   
+  
   #ou avec scale
-  # hier1=scale(as.matrix(hier[,c(-1,-2)],center=TRUE,scale=TRUE))
+  #hier1=scale(as.matrix(hier[,c(-1,-2)],center=TRUE,scale=TRUE))
   # rownames(hier1)=hier[,c(1,2)] puis on rajoute les colonnes numeriques
-  output$hier1=renderDataTable({cendata})
+  output$hier1=renderDataTable({
+    cendata=hier
+    cendata$Region[cendata$Region==1]="Lisnon"
+    cendata$Region[cendata$Region==2]="Oporto"
+    cendata$Region[cendata$Region==3]="Autres"
+    cendata
+    },options =list(pageLength=5))
   
   #calcul des distances(euclidean,maximum,manhattan,canberra,binary,minkowski) pour la matrice de distance entre les individu
   cendata=as.matrix(hier) 
@@ -505,24 +535,83 @@ server <- function(input, output,session) {
   output$hier2=renderPrint({distdata})
   
   #classification ascendante hierarchique 'single','complete','average','ward','ward.D','ward.D2'
-  cahdata=hclust(distdata,method = 'ward')
-     #output$hier3=renderDataTable({cahdata})
+   cahdata=hclust(distdata,method = 'ward')
+  output$hier3=renderPrint({cahdata})
   
   #affichage du dendogramme avec materialisation des classes border=1 a 5 pour la couleur du cardre
-  #cahdata1=rect.hclust(cahdata,k=input$den,border=2)
-  output$hier4=renderPlot({plot(cahdata)})
+  output$hier4=renderPlot({
+    plot(cahdata)
+    rect.hclust(cahdata,k=input$den,border=2)
+    })
   
   #decoupage en k groupes ou classes
-  kcahdata=cutree(cahdata,k=3)
-  kcahdata1=table(kcahdata)
-  output$hier5=renderDataTable({kcahdata1})
+  output$hier5=renderTable({
+    hier$Channel=NULL
+    kcahdata=cutree(cahdata,k=input$den)
+    table(kcahdata)
+    })
   
-  #ajout au fichier d'origine lq nouvelle vqriqble kcahdata
-  # totcahdata=cbind(hierac,kcahdata)
+ # #ajout au fichier d'origine la nouvelle variable kcahdata
   
-  ##kmeans
-  # data$=NULL
-  #----------------------------------------
+  output$hier6=renderTable({
+    kcahdata=cutree(cahdata,k=input$den)
+    ajout=cbind(hierac,kcahdata)
+    head(ajout)
+    
+  })
+
+  
+  
+  ##----autre methode kmeans----##
+  data = read.csv('./data/Wholesale customers data (1).csv')
+  
+  output$print=renderPrint({kmoy=kmeans(distdata,input$clust)
+  kmoy$cluster}) 
+  
+  output$kmean=renderTable({ kmoy=kmeans(distdata,input$clust)
+  attributes(kmoy)
+  kmoy$cluster
+  table(kmoy$cluster)})
+  
+  data_norm2 = read.csv('./data/Wholesale customers data (1).csv')
+  data_norm2$Channel=NULL
+  data_norm2$Region=NULL
+  data_norm2$Fresh=(data_norm2$Fresh-min(data_norm2$Fresh))/(max(data_norm2$Fresh)-min(data_norm2$Fresh))
+  data_norm2$Milk=(data_norm2$Milk-min(data_norm2$Milk))/(max(data_norm2$Milk)-min(data_norm2$Milk))
+  data_norm2$Grocery=(data_norm2$Grocery-min(data_norm2$Grocery))/(max(data_norm2$Grocery)-min(data_norm2$Grocery))
+  data_norm2$Frozen=(data_norm2$Frozen-min(data_norm2$Frozen))/(max(data_norm2$Frozen)-min(data_norm2$Frozen))
+  data_norm2$Detergents_Paper=(data_norm2$Detergents_Paper-min(data_norm2$Detergents_Paper))/(max(data_norm2$Detergents_Paper)-min(data$Detergents_Paper))
+  data_norm2$Delicassen=(data_norm2$Delicassen-min(data_norm2$Delicassen))/(max(data_norm2$Delicassen)-min(data_norm2$Delicassen))
+  
+  
+  ##clusters
+  # Combine the selected variables into a new data frame
+  selectedData <- reactive({
+    data_norm2[, c(input$X, input$Y)]
+  })
+  
+  clusters <- reactive({
+    kmeans(selectedData(), input$clust)
+  })
+  
+  output$plot1 <- renderPlot({
+    
+    palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
+              "#FF7F00", "#FFFF33", "#A65628", "#F781BF", "#999999"))
+    
+    
+    # par(mar = c(5.1, 4.1, 0, 1))
+    plot(selectedData(),
+         col = clusters()$cluster,
+         pch = 20, cex = 3)
+    points(clusters()$centers, pch = 4, cex = 4, lwd = 4)
+  })
+  
+  
+  
+  
+  
+  
   df=data[,-c(1,2)]
   #output$dataclean=renderDT({df})
   
@@ -562,33 +651,9 @@ server <- function(input, output,session) {
   data_norm$Detergents_Paper=(data_norm$Detergents_Paper-min(data_norm$Detergents_Paper))/(max(data_norm$Detergents_Paper)-min(data$Detergents_Paper))
   data_norm$Delicassen=(data_norm$Delicassen-min(data_norm$Delicassen))/(max(data_norm$Delicassen)-min(data_norm$Delicassen))
   output$dat2=renderDataTable({data_norm})
-  
-  ##clusters
-  # Combine the selected variables into a new data frame
-  selectedData <- reactive({
-    data_norm[, c(input$X, input$Y)]
-  })
-  
-  clusters <- reactive({
-    kmeans(selectedData(), input$clust)
-  })
-  
-  output$plot1 <- renderPlot({
-   # input$clu
-   # isolate({
-      palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
-                "#FF7F00", "#FFFF33", "#A65628", "#F781BF", "#999999"))
-      
-      
-      # par(mar = c(5.1, 4.1, 0, 1))
-      plot(selectedData(),
-           col = clusters()$cluster,
-           pch = 20, cex = 3)
-      points(clusters()$centers, pch = 4, cex = 4, lwd = 4)})
- # })
-  #---------------------------------
 
-  output$TEST=renderText(input$milk)
+
+ # output$TEST=renderText(input$milk)
   
   # Remplacement des Niveau de l'attribut Region par les valeurs categorielles
   
@@ -975,34 +1040,7 @@ output$data= renderDataTable({data},options =list(pageLength=5))
     data_norm$Delicassen=(data_norm$Delicassen-min(data_norm$Delicassen))/(max(data_norm$Delicassen)-min(data_norm$Delicassen))
     output$dat2=renderDataTable({data_norm})
     
-    ##clusters
-    # Combine the selected variables into a new data frame
-    selectedData <- reactive({
-      data_norm[, c(input$X, input$Y)]
-    })
-    
-    clusters <- reactive({
-      kmeans(selectedData(), input$clust)
-    })
-    
-    output$plot1 <- renderPlot({input$clu
-      isolate({
-        palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
-                  "#FF7F00", "#FFFF33", "#A65628", "#F781BF", "#999999"))
-        
-        
-        # par(mar = c(5.1, 4.1, 0, 1))
-        plot(selectedData(),
-             col = clusters()$cluster,
-             pch = 20, cex = 3)
-        points(clusters()$centers, pch = 4, cex = 4, lwd = 4)})
-    })
-    #---------------------------------
-    
-
-
- 
-   #prediction(input$model,input$milk,input$fresh,input$grocery,input$frozen,input$detergent,input$delis)
+    #prediction(input$model,input$milk,input$fresh,input$grocery,input$frozen,input$detergent,input$delis)
     
 
     
