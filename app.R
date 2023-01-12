@@ -412,37 +412,27 @@ tabsetPanel(
                     #affichage du dendogramme avec materialisation des classes, border=1 a 5 pour le calcul des cardes
                     #decoupage en k groupes
                     tabsetPanel(
-                      tabPanel('Numerisation',dataTableOutput('numdata')),
+                     # tabPanel('Numerisation',dataTableOutput('numdata')),
                       tabPanel('Centralisation et Reduction',dataTableOutput('hier1')),
                       tabPanel('matrice de distance',verbatimTextOutput('hier2')),
                      # tabPanel('CAH',dataTableOutput('hier3')),
-                      tabPanel('Dendogramme',
-                               sidebarLayout(
-                                 sidebarPanel( numericInput('den','Select the number of clusters',min=2,value=10,step=1 ),
-                                              submitButton(text='Afficher',icon = NULL,width=NULL)
+                     tabPanel('Dendogramme',
+                              sidebarLayout(
+                                sidebarPanel( numericInput('den','Select the number of clusters',min=2,value=2,step=1 ),
+                                              submitButton(text = 'View',width = '200px',icon('th'))
                                               
-                                               
-                                 ),
-                        
-                        tabPanel('Dendogramme',
-                                 sidebarLayout(
-                                   sidebarPanel( numericInput('den','Select the number of clusters',min=2,value=2,step=1 ),
-                                                 submitButton(text = 'View',width = '200px',icon('th'))
-                                                 
-                                   ),
-                                   mainPanel(
-                                     tags$div(class='div8',
-                                     tags$div(class='div9',plotOutput('hier4')),
-                                            tags$div(class='div10',tableOutput('hier5'))
-                                     ),
-                                             tags$div(class='div11',tableOutput('hier6'))
-                                   )
-                                 )
-                                 
-                                 
-                        )
-                      )       
-             )
+                                ),
+                                mainPanel(
+                                  tags$div(class='div8',
+                                           tags$div(class='div9',plotOutput('hier4')),
+                                           tags$div(class='div10',tableOutput('hier5'))
+                                  ),
+                                  tags$div(class='div11',tableOutput('hier6'))
+                                )
+                              )
+                              
+                              
+                     )
              
            ),
            tags$footer(class='w-[98vw] p-[100] h-[70px] bg-[#8c07da] relative top-[155px] text-[whitesmoke]',tags$div(class='flex  space-around flex-row', tags$p('Copyright 2022'),tags$p('DataMining'),tags$p('Classification Model')
@@ -450,7 +440,7 @@ tabsetPanel(
            )
     
     
-  ),
+  ))),
   
   tabPanel("Rules Extraction", sidebarLayout(
     sidebarPanel(tags$h3('Extract rules concluding with class Region', 
