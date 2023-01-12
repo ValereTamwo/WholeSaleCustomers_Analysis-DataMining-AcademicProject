@@ -24,6 +24,7 @@ library(DT)
 library(arules)
 library(ggplot2)
 #library(arulesViz)
+library("gmodels")
 
 # charger le jeu de donnee + Preprocessing data
 data = read.csv('./data/Wholesale customers data (1).csv')
@@ -323,7 +324,7 @@ tabsetPanel(
                                  tags$div(class="w-[400px] h-[500px] border-[1px] rounded-[10px]",
                                           tags$h3('Line Plot', 
                                                   class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]"),
-                                          tags$div(class='w-full h-[50%]'),
+                                          tags$div(class='w-full h-[50%]',plotOutput('line_plot')),
                                           tags$div(class="w-full h-[40%]",tags$h3('Analysis', 
                                                                                   class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[15px] border-y-[1px]")
                                           )
@@ -342,7 +343,8 @@ tabsetPanel(
     tabPanel("Statistical Analysis",
       sidebarLayout(
         sidebarPanel(wellPanel(tags$h2(class="text-[#8c07da] text-[17px]", "HeatMap Correlation plot"),
-                               tags$div(class="w-full p-[10px] h-[70%] rounded-[15%] ",plotOutput("heat"),tags$div(class="w-[90%] mt-[30px] h-[30vh] rounded-[10px] border-[blue] border-[1px] p-[10px]","Analisis")
+                               tags$div(class="w-full p-[10px] h-[70%] rounded-[15%] ",plotOutput("heat"),tags$div(class="w-[90%] mt-[30px] h-[40vh] rounded-[10px] border-[blue] border-[1px] p-[10px]",tags$h3(class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] text-[#8c07da] text-[17px] border-y-[1px]", "Analisis"),
+                                                                                                                   tags$p("By observing the position statistics, we notice the variance of the data is very high compared to the average. The standard deviation is very far from the mean."),tags$p("On the other hand, the attribute data : ") ,tags$p("Channel and Region ",class="text-[red]"),tags$p("Vary very little. We are therefore going to Delete the Channel attribute which does not seem interesting for the Problem to be solved and Region will be used as the Class attribute") )
                                         )
                                )),mainPanel(
                                  tags$div(class='w-[100%] h-[30%]',
@@ -442,6 +444,16 @@ tabsetPanel(
                                  tags$h3('Rules', class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),class='w-[35vw]   h-[77vh] border-[1px] rounded-[10px] pr-[10px] pb-[10px] pl-[10px]',
                                  tags$div(class='w-[90%] h-[50%] border-[1px] rounded-[10px] border-[] relative top-[5%] left-[1.5vw] p-[10px] overflow-scroll ',
                                           dataTableOutput('rule_f')
+                                 ), tags$div(class='w-[85%] h-[33%]  border-[1px] rounded-[10px] border-[] relative top-[10%] left-[1.5vw] p-[10px] ',
+                                             tags$h3(class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] text-[#8c07da] text-[17px] border-y-[1px]", "Analisis (for support : 60% , confidence :80%)"),
+                                          tags$p("
+                                          if a customer's expenses are categorized as: "),
+                                          tags$p("{Grocery=un,Frozen=un,Detergents_Paper=un}"),
+                                          tags$p("{Milk=un,Grocery=un,Frozen=un,Detergents_Paper=un}"),
+                                          tags$p("Milk=un,Grocery=un,Frozen=un,Detergents_Paper=un,Delicassen=un}, "),
+                                          tags$p("{Grocery=un,Detergents_Paper=un} "),
+                                          tags$p("{Grocery=un,Frozen=un,Detergents_Paper=un,Delicassen=un}"),
+                                          tags$p( class="text-[#8c07da]", "then their region is equivalent to categorized region 3"),
                                  )
                         ),
                         tags$div(
@@ -478,10 +490,10 @@ p("MILK: annual spending (m.u.) on milk products (Continuous)"),
  p("DETERGENTS_PAPER: annual spending (m.u.) on detergents and paper products (Continuous)"),
  p("DELICATESSEN: annual spending (m.u.)on and delicatessen products (Continuous)"),
  p("CHANNEL: customersâ€™ Channel - Horeca (Hotel/Restaurant/CafÃ©) or Retail channel (Nominal)"),
- p("REGION: customersâ€™ Region â€“ Lisnon, Oporto or Other (Nominal)" )                                                                                                                                      #plotOutput("distPlot")
+ p("REGION: customersâ€™ Region â€“ Lisnon, Oporto or Other (Nominal)   " )                                                                                                                                      #plotOutput("distPlot")
                                                                                                                                        
                                                                                                                               )
-                                                                                                                              
+                                                                                                        
                                                                                                                           
                                                                                                                          #      ) 
                                                                                                                                )
@@ -716,6 +728,28 @@ server <- function(input, output,session) {
    # predict
   })
   
+  
+  output$confNN = renderTable({
+    clean = cleaning(data=data)
+    #clean[['Region']]=factor(clean[['Region']])
+    nt=sample(1:nrow(clean),0.7*nrow(clean))
+    trains=clean[nt,-1]
+    tests = clean[-nt,-1]  
+    
+    if(input$model=="Neural Network"){
+  
+          nn = neuralnet(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data=trains,hidden=3,act.fct = "logistic",
+                     linear.output = TRUE)
+      # predictNN = compute(nn,tests[,-1])
+      # prob = predictNN$net.result
+      #pred <- ifelse(prob>0.5, 0,1)
+      predd = compute(nn,tests[,-1])
+      table(apply(predd, 1, which.max),tests[,1])
+      #predict_N= predict(model,tests[,-1])
+      
+       CrossTable(predd,tests[,1])
+    }
+  })
   output$matC = renderPrint({
     clean = cleaning(data=data)
     clean[['Region']]=factor(clean[['Region']])
@@ -737,16 +771,7 @@ server <- function(input, output,session) {
       confusionMatrix(table(predict_,tests[,1]))
     }else if(input$model=="Neural Network"){
       
-      nn = neuralnet(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data=trains,hidden=3,act.fct = "logistic",
-                     linear.output = FALSE)
-     # predictNN = compute(nn,tests[,-1])
-     # prob = predictNN$net.result
-      #pred <- ifelse(prob>0.5, 0,1)
-      predd = predict(nn,tests[,-1] )
-      table(tests[,1],apply(predd, 1, which.max))
-      #predict_N= predict(model,tests[,-1])
-      
-      matcc = table(predd,tests[,1])
+    
       
     }else if(input$model=="SVM"){
       #trctrl=trainControl(method = "repeatedcv",number = 10,repeats = 3)
@@ -975,12 +1000,28 @@ output$data= renderDataTable({data},options =list(pageLength=5))
      #-----------------------------Visualizing data ----------------------
      
      viz_pie = reactive({
-     #  df1=read.csv('data/Wholesale customers data (1).csv')
-        ggplot(data) +
-         geom_bar(aes_string(x=input$attr1)) +
-         coord_polar("y", start=0) +
-         
-         theme_void()
+       # Create a basic bar
+       dat = data 
+       dat$Region[dat$Region==1]="Lisnon"
+       dat$Region[dat$Region==2]="Oporto"
+       dat$Region[dat$Region==3]="Autres"
+       pie = ggplot(dat , aes(x="", y=input$attr1, fill=Region)) + geom_bar(stat="identity", width=1)
+       
+       # Convert to pie (polar coordinates) and add labels
+       pie = pie + coord_polar("y", start=0) 
+       
+       # Add color scale (hex colors)
+       pie = pie + scale_fill_manual(values=c("#0797da","#5807da","#8d07da")) 
+       
+       # Remove labels and add title
+       pie = pie + labs(x = NULL, y = NULL, fill = NULL, title = "")
+       
+       # Tidy up the theme
+       pie = pie + theme_classic() + theme(axis.line = element_blank(),
+                                           axis.text = element_blank(),
+                                           axis.ticks = element_blank(),
+                                           plot.title = element_text(hjust = 0.5, color = "#666666"))
+       plot(pie)
      })
      
      
@@ -997,6 +1038,11 @@ output$data= renderDataTable({data},options =list(pageLength=5))
      output$scat_plot <- renderPlot({
        ggplot(data = data) +
          geom_point(aes_string(x = input$attr1,y=input$attr2))
+     })
+     
+     output$line_plot <- renderPlot({
+       ggplot(data = data) +
+         geom_line(aes_string(x = input$attr1,y=input$attr2))
      })
      
     output$pie=renderPlot(viz_pie())
