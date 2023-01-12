@@ -402,24 +402,6 @@ tabsetPanel(
                       
              ),
            
-<<<<<<< HEAD
-             tabPanel('hierachic',
-                      
-                      #on identifie d'abord si nos donnees sont numeriques si non on les discretise avec as.numeric()
-                      #ensuite on centre et on reduit nos donnees avec la normalisation z-score ou avec scale puis on tramnsforme en matrice
-                      #on centre et on reduit pourenlever le probleme des differentes unites p e
-                      #on calcul la matrice de distance entre les individus avec ?dist
-                      #classification ascendante hierachique 'ward'ou 'ward.D' ou 'ward.D2'
-                      #affichage du dendogramme avec materialisation des classes, border=1 a 5 pour le calcul des cardes
-                      #decoupage en k groupes
-                      tabsetPanel(
-                       # tabPanel('numerisation des donnees',dataTableOutput('numdata')),
-                        tabPanel('centralisation et numerisation des donnees',dataTableOutput('hier1')),
-                        tabPanel('matrice de distance',
-                                 tags$div(class='div4',
-                                 tags$div(class='div5',verbatimTextOutput('hier2')),
-                               tags$div(class='div6',tags$h3(class='div7','Description'),verbatimTextOutput('hier3')))
-=======
 
            tabPanel('hierachic',
                     #on identifie d'abord si nos donnees sont numeriques si non on les discretise avec as.numeric()
@@ -440,7 +422,6 @@ tabsetPanel(
                                               submitButton(text='Afficher',icon = NULL,width=NULL)
                                               
                                                
->>>>>>> 8c10f9002ab7ebadd922a92ccfae7636cda60dfd
                                  ),
                         
                         tabPanel('Dendogramme',
