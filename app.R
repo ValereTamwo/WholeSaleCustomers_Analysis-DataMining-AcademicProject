@@ -194,7 +194,7 @@ tabsetPanel(
     wellPanel("Warning",icon('warning'),class=" text-[20px] text-[red]",
               tags$p(class="w-[full] text-[14px] text-[#333] h-[70px] justify-center items-center p-[10px]","Initially Our DataSet Has no Missing Data"),
               tags$div(class="w-[80%] left-[1.5vw] p-[10px]  relative h-[40vh] border-[1px] rounded-[10px] text-[17px] text-[#333]",tags$p("Deleting Outliers Value Will bring us missing data for Each attributes : "),
-                       tags$button(id="delete",icon("trash"),"Delete Outlier",class="bg-[red] text-[white] relative left-[20px] top-[23vh] h-[40px] w-[90%] text-[center] rounded-[10px]"),
+                       tags$button(id="delete",icon("trash"),"View Confirmation",class="bg-[red] text-[white] relative left-[20px] top-[23vh] h-[40px] w-[90%] text-[center] rounded-[10px]"),
                        bsModal(id = 'outdata',title = 'Warning',trigger = 'delete',
                                wellPanel(
                                  tags$div(
@@ -294,7 +294,7 @@ tabsetPanel(
              ,mainPanel(actionButton("toggleSidebarPanel", "", icon = icon("bars")),
                         tags$div(class="grid grid-cols-2 gap-4",
                                 tags$div(class="w-[400px] h-[500px] border-[1px] mr-[10vw] p-[10px] rounded-[10px]",
-                                         tags$h3('Histogram', 
+                                         tags$h3('pie Chart', 
                                                  class="relative w-[full] h-[40px] p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
                                          tags$div(class='w-full h-[50%]',
                                                  plotOutput("pie")
@@ -305,7 +305,7 @@ tabsetPanel(
                                          )
                                          ),
                                  tags$div(class="w-[400px] h-[500px] flex flex-col gap-[4px] border-[1px] rounded-[10px]",
-                                          tags$h3('Pie Chart', 
+                                          tags$h3('Histogram', 
                                                   class="relative w-[full] h-[40px]  p-[4px] flex items-center justify-center pt-[5px] border-y-[1px]"),
                                           tags$div(class='w-full h-[50%]',
                                                    plotOutput("my_plot")),
@@ -548,6 +548,7 @@ server <- function(input, output,session) {
   #centrer et reduire les donnees
   data = read.csv('./data/Wholesale customers data (1).csv')
   hierac=data
+  hierac$Channel = NULL
   hier=hierac
    #hier$Region=NULL
   hier$Channel=NULL
@@ -838,7 +839,7 @@ server <- function(input, output,session) {
          #               tuneLength = 10)
       svm_= svm(Region~Fresh+Milk+Grocery+Frozen+Detergents_Paper+Delicassen,data = trains)
       pred_S = predict(svm_,newdata = tests[,-1])
-      confusionMatrix(table(pred_S,tests[,1]))
+      confusionMatrix(table(pred_S,tests[,1])) 
     }
     # predict
   })
