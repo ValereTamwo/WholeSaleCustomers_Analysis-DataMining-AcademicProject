@@ -7,6 +7,8 @@
 #    http://shiny.rstudio.com/
 #
 
+setwd("/home/valere/R-test/WholeSaleCustomers_Analysis-DataMining-AcademicProject")
+
 library(shiny)
 library(shiny.tailwind)
 #library(shinydashboard)
