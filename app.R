@@ -7,7 +7,7 @@
 #    http://shiny.rstudio.com/
 #
 
-setwd("/home/valere/R-test/WholeSaleCustomers_Analysis-DataMining-AcademicProject")
+#setwd("/home/valere/R-test/WholeSaleCustomers_Analysis-DataMining-AcademicProject")
 
 library(shiny)
 library(shiny.tailwind)
@@ -29,7 +29,7 @@ library(ggplot2)
 library("gmodels")
 
 # charger le jeu de donnee + Preprocessing data
-data = read.csv('./data/Wholesale customers data (1).csv')
+data = read.csv('Wholesale customers data (1).csv')
 cleaning = function(data){
   #Fresh Outlier
   clean = data
@@ -548,7 +548,7 @@ server <- function(input, output,session) {
  # output$numdata=renderDataTable({hierac})
   
   #centrer et reduire les donnees
-  data = read.csv('./data/Wholesale customers data (1).csv')
+  data = read.csv('Wholesale customers data (1).csv')
   hierac=data
   hier=hierac
    #hier$Region=NULL
@@ -607,7 +607,7 @@ server <- function(input, output,session) {
   
   
   ##----autre methode kmeans----##
-  data = read.csv('./data/Wholesale customers data (1).csv')
+  data = read.csv('Wholesale customers data (1).csv')
   
   output$print=renderPrint({kmoy=kmeans(distdata,input$clust)
   kmoy$cluster}) 
@@ -617,7 +617,7 @@ server <- function(input, output,session) {
   kmoy$cluster
   table(kmoy$cluster)})
   
-  data_norm2 = read.csv('./data/Wholesale customers data (1).csv')
+  data_norm2 = read.csv('Wholesale customers data (1).csv')
   data_norm2$Channel=NULL
   data_norm2$Region=NULL
   data_norm2$Fresh=(data_norm2$Fresh-min(data_norm2$Fresh))/(max(data_norm2$Fresh)-min(data_norm2$Fresh))
@@ -685,7 +685,7 @@ server <- function(input, output,session) {
   
   
   ##normalisation
-  data_norm =  read.csv('./data/Wholesale customers data (1).csv')
+  data_norm =  read.csv('Wholesale customers data (1).csv')
   data_norm$Channel=NULL
   data_norm$Region=NULL
   data_norm$Fresh=(data_norm$Fresh-min(data_norm$Fresh))/(max(data_norm$Fresh)-min(data_norm$Fresh))
@@ -1145,7 +1145,7 @@ output$data= renderDataTable({data},options =list(pageLength=5))
     
     
     ##normalisation
-    data_norm =  read.csv('./data/Wholesale customers data (1).csv')
+    data_norm =  read.csv('Wholesale customers data (1).csv')
     data_norm$Channel=NULL
     data_norm$Region=NULL
     data_norm$Fresh=(data_norm$Fresh-min(data_norm$Fresh))/(max(data_norm$Fresh)-min(data_norm$Fresh))

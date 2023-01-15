@@ -1,0 +1,14 @@
+name: WholeSaleCustomers_Analysis
+title: WholeSaleCustomers_Analysis
+username:
+account: valere
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8033861
+bundleId: 6731305
+url: https://valere.shinyapps.io/WholeSaleCustomers_Analysis/
+when: 1673645282.66598
+lastSyncTime: 1673645282.66599
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: font
